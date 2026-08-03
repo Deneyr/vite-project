@@ -1,144 +1,298 @@
 import './style.css'
-import { setupCounter } from './counter.js'
+
+/* ---------- data ---------- */
+
+const mainCourses = [
+  'Astronomie',
+  'Botanique',
+  'Défense contre les forces du Mal',
+  'Enchantement',
+  'Histoire de la Magie',
+  'Métamorphose',
+  'Potions',
+  'Vol',
+]
+
+const secondaryCourses = [
+  'Arithmancie',
+  'Divination',
+  'Étude des Moldus',
+  'Étude des Runes',
+  'Soins aux créatures magiques',
+]
+
+const espritSkillsLeft = ['Bluff', 'Farce', 'Tactique', 'Rumeur']
+const espritSkillsRight = ['Bagarre', 'Endurance', 'Perception', 'Précision']
+const coeurCorpsSkills = ['Décorum', 'Discrétion', 'Persuasion', 'Romance']
+
+const PIPS_PER_SKILL = 6
+
+/* ---------- small render helpers ---------- */
+
+const diamond = () => `<button type="button" class="diamond" aria-label="rang"></button>`
+
+const pipRow = (count = PIPS_PER_SKILL) =>
+  `<div class="pip-row">${Array.from({ length: count }, diamond).join('')}</div>`
+
+const skillRow = (name) => `
+  <li class="skill-row">
+    <span class="skill-name">${name}</span>
+    ${pipRow()}
+  </li>
+`
+
+const subItem = (name) => `
+  <div class="substat"><span>${name}</span><input class="substat-input" type="number" min="0" /></div>
+`
+
+const bookIcon = () => `
+  <svg viewBox="0 0 24 24"><path d="M4 4h7a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H4Z"/><path d="M20 4h-7a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H20Z"/></svg>
+`
+
+const boltIcon = () => `
+  <svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6z" stroke-linejoin="round"/></svg>
+`
+
+const diceIcon = () => `
+  <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="8.5" cy="8.5" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1" fill="currentColor" stroke="none"/></svg>
+`
+
+const flaskIcon = () => `
+  <svg viewBox="0 0 24 24"><path d="M9 2v6L4 19a2 2 0 0 0 2 3h12a2 2 0 0 0 2-3l-5-11V2"/><path d="M9 2h6"/><path d="M6.5 15h11"/></svg>
+`
+
+const chessIcon = () => `
+  <svg viewBox="0 0 24 24"><path d="M9 20h6"/><path d="M8 20l1-6h6l1 6"/><path d="M9.5 14c-1-2 0-3.5 1-4.5s1-2 0-3"/><path d="M13.5 14c1-2 0-3.5-1-4.5s-1-2 0-3"/><circle cx="12" cy="4.5" r="1.6"/></svg>
+`
+
+const personIcon = () => `
+  <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c1.2-4 4-6 7-6s5.8 2 7 6"/></svg>
+`
+
+/* ---------- markup ---------- */
 
 document.querySelector('#app').innerHTML = `
-<div class="dashboard-shell">
-  <header class="sheet-header">
-    <div class="title-block">
-      <div class="title-meta">
-        <span class="persona-label">Personnage</span>
-        <div class="main-title">
-          <span>Tu es un</span>
-          <strong>SORCIER</strong>
-        </div>
-        <div class="character-grid">
-          <div class="character-row editable-row">
-            <label>Joueuse / joueur</label>
-            <input class="input-field" type="text" value="Aria Valion" />
-          </div>
-          <div class="character-row editable-row">
-            <label>Table</label>
-            <input class="input-field" type="text" value="L’Académie" />
-          </div>
-          <div class="character-row editable-row">
-            <label>Époque</label>
-            <input class="input-field" type="text" value="Renaissance magique" />
-          </div>
-        </div>
-      </div>
-      <button id="toggle-edit" class="toggle-edit">Edit</button>
-    </div>
+<div class="sheet-shell">
 
-    <div class="right-panel">
-      <div class="shield-card">
-        <svg class="shield-icon" viewBox="0 0 84 100" aria-hidden="true">
-          <path d="M42 4 L74 18 L74 52 C74 74 58 92 42 98 C26 92 10 74 10 52 L10 18 Z" fill="none" stroke="currentColor" stroke-width="5"/>
-          <path d="M42 20 L42 62" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
-          <path d="M42 74 c-10 -10 -10 -18 0 -28 c10 10 10 18 0 28" fill="none" stroke="currentColor" stroke-width="4"/>
-          <circle cx="42" cy="40" r="6" fill="currentColor"/>
-        </svg>
-        <div>
-          <span>Action de Maître</span>
-          <strong>+5</strong>
-        </div>
-      </div>
-      <div class="status-cards">
-        <div class="status-chip">
-          <span>Année scolaire</span>
-          <strong>en cours</strong>
-        </div>
-        <div class="status-chip">
-          <span>B.U.S.E.</span>
-          <strong>A.S.P.I.C.</strong>
-        </div>
-      </div>
-    </div>
+  <header class="title-banner">
+    <span class="eyebrow">Tu es un</span>
+    <h1>Sorcier</h1>
+    <button id="toggle-edit" class="toggle-edit">Édition</button>
   </header>
 
-  <section class="core-shell">
-    <div class="center-forest">
-      <div class="triangle-backdrop"></div>
-      <div class="circle-center">
-        <div class="circle-label">MAGIE</div>
-        <input class="center-input" type="number" value="16" min="0" />
-      </div>
-      <div class="node node-top">
-        <svg class="node-icon" viewBox="0 0 64 64" aria-hidden="true">
-          <path d="M32 8 L38 28 L60 28 L42 40 L48 60 L32 48 L16 60 L22 40 L4 28 L26 28 Z" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/>
-        </svg>
-        <div class="node-copy">
-          <input class="node-value" type="number" value="14" min="0" />
-          <span>Esprit</span>
-          <small>Mental</small>
-        </div>
-      </div>
-      <div class="node node-left">
-        <svg class="node-icon" viewBox="0 0 64 64" aria-hidden="true">
-          <path d="M32 54s22-14 22-28S40 8 32 8 10 18 10 26s22 28 22 28Z" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/>
-        </svg>
-        <div class="node-copy">
-          <input class="node-value" type="number" value="12" min="0" />
-          <span>Cœur</span>
-          <small>Social</small>
-        </div>
-      </div>
-      <div class="node node-right">
-        <svg class="node-icon" viewBox="0 0 64 64" aria-hidden="true">
-          <path d="M16 16h32v20L32 52 16 36V16Z" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/>
-          <path d="M24 16v-6h16v6" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
-        </svg>
-        <div class="node-copy">
-          <input class="node-value" type="number" value="13" min="0" />
-          <span>Corps</span>
-          <small>Physique</small>
-        </div>
-      </div>
-      <div class="triangle-lines">
-        <div class="connector connector-top"></div>
-        <div class="connector connector-left"></div>
-        <div class="connector connector-right"></div>
+  <section class="top-grid">
+    <div class="parchment-block identity-block">
+      <span class="block-label">Personnage</span>
+      <div class="field-row"><span>Joueuse / joueur</span><input class="input-field" type="text" value="Aria Valion" /></div>
+      <div class="field-row"><span>Table</span><input class="input-field" type="text" value="L’Académie" /></div>
+      <div class="field-row"><span>Époque</span><input class="input-field" type="text" value="Renaissance magique" /></div>
+    </div>
+
+    <div class="parchment-block origin-block">
+      <span class="block-label">Origine</span>
+      <div class="origin-options">
+        <label class="origin-choice"><span class="diamond origin-pip"></span>Né-Moldu</label>
+        <label class="origin-choice"><span class="diamond origin-pip"></span>Sang-Mêlé</label>
+        <label class="origin-choice"><span class="diamond origin-pip"></span>Sang-Pur</label>
       </div>
     </div>
-    <div class="core-notes">
-      <div class="core-touch">
-        <label class="field-label" for="ambition">Ambition</label>
-        <textarea id="ambition" class="textarea-field">Découvrir l’ancien savoir des sorciers et changer le destin du monde.</textarea>
+
+    <div class="parchment-block school-block">
+      <span class="block-label">Année scolaire</span>
+      <strong class="school-status">en cours</strong>
+      <div class="track-row"><span>B.U.S.E</span><input class="mini-input" type="text" value="_/_" /></div>
+      <div class="track-row"><span>A.S.P.I.C</span><input class="mini-input" type="text" value="_/_" /></div>
+    </div>
+
+    <div class="parchment-block house-block">
+      <svg class="shield-icon" viewBox="0 0 84 100" aria-hidden="true">
+        <path d="M42 4 L74 18 L74 52 C74 74 58 92 42 98 C26 92 10 74 10 52 L10 18 Z" fill="none" stroke="currentColor" stroke-width="5"/>
+        <path d="M42 20 L42 62" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="42" cy="40" r="6" fill="currentColor"/>
+      </svg>
+      <div class="house-action">
+        <span>Action de Maison</span>
+        <input class="mini-input" type="number" value="5" />
       </div>
-      <div class="core-touch small">
-        <label class="field-label" for="wakepoints">Points d’éveil</label>
-        <input id="wakepoints" class="input-field" type="number" value="5" min="0" />
+      <div class="points-eveil">
+        <span>Points d’éveil</span>
+        <input class="input-field" type="number" value="0" min="0" />
       </div>
+    </div>
+  </section>
+
+  <section class="ambition-row">
+    <span class="block-label">Ambition</span>
+    <input class="line-input" type="text" value="Découvrir l’ancien savoir des sorciers et changer le destin du monde." />
+  </section>
+
+  <section class="skills-and-core">
+    <div class="skills-col">
+      <ul class="skill-list">
+        ${mainCourses.map(skillRow).join('')}
+      </ul>
+      <p class="skill-note">1ère &amp; 2nde année : 7 cours principaux + vol · 3ème année : 2 cours secondaires au choix minimum · Nul (-2) / Moyen (0) / Bon (2) / Excellent (4) / Génie (6)</p>
+      <ul class="skill-list">
+        ${secondaryCourses.map(skillRow).join('')}
+      </ul>
+    </div>
+
+    <div class="core-triangle">
+      <div class="side-list left">
+        ${espritSkillsLeft.map(subItem).join('')}
+      </div>
+
+      <div class="triangle-frame">
+        <div class="axis-label axis-mental">mental</div>
+        <svg class="triangle-lines" viewBox="0 0 460 400" preserveAspectRatio="none">
+          <path class="edge-line" d="M230 60 L90 320" />
+          <path class="edge-line" d="M230 60 L370 320" />
+          <path class="edge-line" d="M90 320 L370 320" />
+          <line class="spoke-line" x1="230" y1="60" x2="230" y2="200" />
+          <line class="spoke-line" x1="90" y1="320" x2="230" y2="200" />
+          <line class="spoke-line" x1="370" y1="320" x2="230" y2="200" />
+        </svg>
+
+        <div class="node-circle node-esprit">
+          <div>
+            <div class="node-label">Esprit</div>
+            <input class="stat-input" type="number" value="14" min="0" />
+          </div>
+        </div>
+
+        <div class="node-circle node-magie">
+          <div>
+            <div class="node-label">Magie</div>
+            <input class="stat-input" type="number" value="16" min="0" />
+          </div>
+        </div>
+
+        <div class="node-circle node-coeur">
+          <div>
+            <div class="node-sub">social</div>
+            <div class="node-label">Cœur</div>
+            <input class="stat-input" type="number" value="12" min="0" />
+          </div>
+        </div>
+
+        <div class="node-circle node-corps">
+          <div>
+            <div class="node-sub">physique</div>
+            <div class="node-label">Corps</div>
+            <input class="stat-input" type="number" value="13" min="0" />
+          </div>
+        </div>
+
+        <div class="edge-icon icon-top">${bookIcon()}</div>
+        <div class="edge-icon icon-left">${personIcon()}</div>
+        <div class="edge-icon icon-right">${boltIcon()}</div>
+      </div>
+
+      <div class="side-list right">
+        ${espritSkillsRight.map(subItem).join('')}
+      </div>
+
+      <div class="sub-row bottom">
+        ${coeurCorpsSkills.map(subItem).join('')}
+      </div>
+    </div>
+
+    <div class="traits-panel">
+      <span class="block-label">Traits</span>
+      <div class="traits-list">
+        ${Array.from({ length: 7 }, () => '<div class="trait-line"></div>').join('')}
+      </div>
+    </div>
+  </section>
+
+  <section class="trackers-row">
+    <div class="tracker erudition">
+      <span class="tracker-label">Érudition</span>
+      <div class="tracker-icons">
+        ${Array.from({ length: 5 }, () => `<button type="button" class="icon-toggle">${bookIcon()}</button>`).join('')}
+      </div>
+    </div>
+    <div class="tracker energie">
+      <div class="tracker-icons">
+        ${Array.from({ length: 4 }, () => `<button type="button" class="icon-toggle">${boltIcon()}</button>`).join('')}
+      </div>
+      <span class="tracker-label">Énergie</span>
     </div>
   </section>
 
   <section class="bottom-grid">
-    <article class="panel panel-left">
-      <div class="panel-title">
-        <span>Sortilèges</span>
-        <strong>Liste</strong>
-      </div>
-      <textarea class="textarea-field" rows="5">Éclair silencieux
-Barrière d’ombre
-Transmutation lunaire
-Portail d’éther</textarea>
+    <article class="panel spells-panel">
+      <div class="panel-title">Sortilèges</div>
+      <ul class="spell-list">
+        ${['Éclair silencieux', 'Barrière d’ombre', 'Transmutation lunaire', 'Portail d’éther', '', '', '']
+          .map(
+            (v) => `
+          <li class="spell-row">
+            <button type="button" class="diamond" aria-label="maîtrisé"></button>
+            <input class="line-input" type="text" value="${v}" />
+          </li>`
+          )
+          .join('')}
+      </ul>
+      <p class="spell-note"><span class="diamond" style="pointer-events:none"></span> si sortilège est maîtrisé</p>
     </article>
 
-    <article class="panel panel-right">
-      <div class="panel-title">
-        <span>Possessions</span>
-        <strong>Équipement</strong>
+    <article class="panel possessions-panel">
+      <div>
+        <div class="panel-title">Possessions</div>
+        <textarea class="textarea-field" rows="5">Grimoire ancien, baguette d’onyx, cape d’invisibilité, orbe des rêves, potion de régénération.</textarea>
+        <div class="pages-block">
+          <div class="panel-title">Pages</div>
+          <textarea class="textarea-field" placeholder="Notes, journal, pages arrachées du grimoire..."></textarea>
+        </div>
       </div>
-      <textarea class="textarea-field" rows="4">Grimoire ancien, baguette d’onyx, cape d’invisibilité, orbe des rêves, potion de régénération.</textarea>
-      <button id="counter" type="button" class="counter">Points d’action</button>
+      <div class="possessions-rail">
+        <button type="button" class="icon-toggle">${diceIcon()}</button>
+        <button type="button" class="icon-toggle">${bookIcon()}</button>
+        <button type="button" class="icon-toggle">${chessIcon()}</button>
+        <button type="button" class="icon-toggle">${flaskIcon()}</button>
+        <button type="button" class="icon-toggle">${personIcon()}</button>
+      </div>
     </article>
   </section>
+
 </div>
 `
 
-setupCounter(document.querySelector('#counter'))
+/* ---------- behaviour ---------- */
+
+// clickable pips (skill ranks / spell mastery) toggle fill up to the clicked pip
+document.querySelectorAll('.pip-row').forEach((row) => {
+  const pips = Array.from(row.querySelectorAll('.diamond'))
+  pips.forEach((pip, index) => {
+    pip.addEventListener('click', () => {
+      const alreadyFull = pip.classList.contains('on') && (pips[index + 1] ? !pips[index + 1].classList.contains('on') : true)
+      pips.forEach((p, i) => p.classList.toggle('on', alreadyFull ? i < index : i <= index))
+    })
+  })
+})
+
+// single mastery pip per spell just toggles on/off
+document.querySelectorAll('.spell-row .diamond').forEach((pip) => {
+  pip.addEventListener('click', () => pip.classList.toggle('on'))
+})
+
+// origin: single-select among the three choices
+const originPips = document.querySelectorAll('.origin-pip')
+originPips.forEach((pip) => {
+  pip.addEventListener('click', () => {
+    originPips.forEach((p) => p.classList.remove('on'))
+    pip.classList.add('on')
+  })
+})
+
+// érudition / énergie / possessions icons: simple toggle
+document.querySelectorAll('.tracker-icons .icon-toggle, .possessions-rail .icon-toggle').forEach((btn) => {
+  btn.addEventListener('click', () => btn.classList.toggle('on'))
+})
 
 const toggleEditBtn = document.querySelector('#toggle-edit')
-const editableFields = Array.from(document.querySelectorAll('.input-field, .textarea-field, .center-input, .node-value'))
+const editableFields = Array.from(document.querySelectorAll('.input-field, .mini-input, .line-input, .textarea-field, .stat-input, .substat-input'))
 let readonlyMode = true
 
 const setReadonly = (readonly) => {
@@ -147,7 +301,7 @@ const setReadonly = (readonly) => {
     field.readOnly = readonly
     field.classList.toggle('readonly-field', readonly)
   })
-  toggleEditBtn.textContent = readonly ? 'Edit' : 'Lock'
+  toggleEditBtn.textContent = readonly ? 'Édition' : 'Verrouiller'
 }
 
 toggleEditBtn.addEventListener('click', () => setReadonly(!readonlyMode))
