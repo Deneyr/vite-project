@@ -5,7 +5,7 @@ export function setupCounter(element) {
   const setCounter = (count) => {
     counter = count;
     element.innerHTML = `count is ${counter}`;
-    OBR.notification.show(`THE count is ${OBR.scene.items.getItems().count()}`);
+    OBR.notification.show(`THE count is ${counter}`);
   };
   element.addEventListener("click", () => setCounter(counter + 1));
   setCounter(0);
