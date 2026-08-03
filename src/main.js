@@ -5,25 +5,28 @@ document.querySelector('#app').innerHTML = `
 <div class="dashboard-shell">
   <header class="sheet-header">
     <div class="title-block">
-      <span class="persona-label">Personnage</span>
-      <div class="main-title">
-        <span>Tu es un</span>
-        <strong>SORCIER</strong>
+      <div class="title-meta">
+        <span class="persona-label">Personnage</span>
+        <div class="main-title">
+          <span>Tu es un</span>
+          <strong>SORCIER</strong>
+        </div>
+        <div class="character-grid">
+          <div class="character-row editable-row">
+            <label>Joueuse / joueur</label>
+            <input class="input-field" type="text" value="Aria Valion" />
+          </div>
+          <div class="character-row editable-row">
+            <label>Table</label>
+            <input class="input-field" type="text" value="L’Académie" />
+          </div>
+          <div class="character-row editable-row">
+            <label>Époque</label>
+            <input class="input-field" type="text" value="Renaissance magique" />
+          </div>
+        </div>
       </div>
-      <div class="character-grid">
-        <div class="character-row">
-          <span>Joueuse / joueur</span>
-          <strong>Aria Valion</strong>
-        </div>
-        <div class="character-row">
-          <span>Table</span>
-          <strong>L’Académie</strong>
-        </div>
-        <div class="character-row">
-          <span>Époque</span>
-          <strong>Renaissance magique</strong>
-        </div>
-      </div>
+      <button id="toggle-edit" class="toggle-edit">Edit</button>
     </div>
 
     <div class="right-panel">
@@ -57,14 +60,14 @@ document.querySelector('#app').innerHTML = `
       <div class="triangle-backdrop"></div>
       <div class="circle-center">
         <div class="circle-label">MAGIE</div>
-        <div class="center-score">16</div>
+        <input class="center-input" type="number" value="16" min="0" />
       </div>
       <div class="node node-top">
         <svg class="node-icon" viewBox="0 0 64 64" aria-hidden="true">
           <path d="M32 8 L38 28 L60 28 L42 40 L48 60 L32 48 L16 60 L22 40 L4 28 L26 28 Z" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/>
         </svg>
         <div class="node-copy">
-          <strong>14</strong>
+          <input class="node-value" type="number" value="14" min="0" />
           <span>Esprit</span>
           <small>Mental</small>
         </div>
@@ -74,7 +77,7 @@ document.querySelector('#app').innerHTML = `
           <path d="M32 54s22-14 22-28S40 8 32 8 10 18 10 26s22 28 22 28Z" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/>
         </svg>
         <div class="node-copy">
-          <strong>12</strong>
+          <input class="node-value" type="number" value="12" min="0" />
           <span>Cœur</span>
           <small>Social</small>
         </div>
@@ -85,7 +88,7 @@ document.querySelector('#app').innerHTML = `
           <path d="M24 16v-6h16v6" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
         </svg>
         <div class="node-copy">
-          <strong>13</strong>
+          <input class="node-value" type="number" value="13" min="0" />
           <span>Corps</span>
           <small>Physique</small>
         </div>
@@ -98,12 +101,12 @@ document.querySelector('#app').innerHTML = `
     </div>
     <div class="core-notes">
       <div class="core-touch">
-        <strong>Ambition</strong>
-        <p>Découvrir l’ancien savoir des sorciers et changer le destin du monde.</p>
+        <label class="field-label" for="ambition">Ambition</label>
+        <textarea id="ambition" class="textarea-field">Découvrir l’ancien savoir des sorciers et changer le destin du monde.</textarea>
       </div>
       <div class="core-touch small">
-        <strong>Points d’éveil</strong>
-        <p>5</p>
+        <label class="field-label" for="wakepoints">Points d’éveil</label>
+        <input id="wakepoints" class="input-field" type="number" value="5" min="0" />
       </div>
     </div>
   </section>
@@ -114,12 +117,10 @@ document.querySelector('#app').innerHTML = `
         <span>Sortilèges</span>
         <strong>Liste</strong>
       </div>
-      <ul class="panel-list">
-        <li>Éclair silencieux</li>
-        <li>Barrière d’ombre</li>
-        <li>Transmutation lunaire</li>
-        <li>Portail d’éther</li>
-      </ul>
+      <textarea class="textarea-field" rows="5">Éclair silencieux
+Barrière d’ombre
+Transmutation lunaire
+Portail d’éther</textarea>
     </article>
 
     <article class="panel panel-right">
@@ -127,7 +128,7 @@ document.querySelector('#app').innerHTML = `
         <span>Possessions</span>
         <strong>Équipement</strong>
       </div>
-      <p>Grimoire ancien, baguette d’onyx, cape d’invisibilité, orbe des rêves, potion de régénération.</p>
+      <textarea class="textarea-field" rows="4">Grimoire ancien, baguette d’onyx, cape d’invisibilité, orbe des rêves, potion de régénération.</textarea>
       <button id="counter" type="button" class="counter">Points d’action</button>
     </article>
   </section>
@@ -135,3 +136,20 @@ document.querySelector('#app').innerHTML = `
 `
 
 setupCounter(document.querySelector('#counter'))
+
+const toggleEditBtn = document.querySelector('#toggle-edit')
+const editableFields = Array.from(document.querySelectorAll('.input-field, .textarea-field, .center-input, .node-value'))
+let readonlyMode = true
+
+const setReadonly = (readonly) => {
+  readonlyMode = readonly
+  editableFields.forEach((field) => {
+    field.readOnly = readonly
+    field.classList.toggle('readonly-field', readonly)
+  })
+  toggleEditBtn.textContent = readonly ? 'Edit' : 'Lock'
+}
+
+toggleEditBtn.addEventListener('click', () => setReadonly(!readonlyMode))
+
+setReadonly(true)
