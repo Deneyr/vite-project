@@ -143,18 +143,18 @@ document.querySelector('#app').innerHTML = `
       </div>
 
       <div class="triangle-frame">
-        <div class="axis-label axis-mental">mental</div>
-        <svg class="triangle-lines" viewBox="0 0 460 400" preserveAspectRatio="none">
-          <path class="edge-line" d="M230 60 L90 320" />
-          <path class="edge-line" d="M230 60 L370 320" />
-          <path class="edge-line" d="M90 320 L370 320" />
-          <line class="spoke-line" x1="230" y1="60" x2="230" y2="200" />
-          <line class="spoke-line" x1="90" y1="320" x2="230" y2="200" />
-          <line class="spoke-line" x1="370" y1="320" x2="230" y2="200" />
+        <svg class="triangle-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <path class="edge-line" d="M30 18 L-20 90" />
+          <path class="edge-line" d="M30 18 L80 90" />
+          <path class="edge-line" d="M-15 90 L75 90" />
+          <line class="spoke-line" x1="30" y1="18" x2="30" y2="64" />
+          <line class="spoke-line" x1="-15" y1="90" x2="30" y2="64" />
+          <line class="spoke-line" x1="75" y1="90" x2="30" y2="64" />
         </svg>
 
         <div class="node-circle node-esprit">
           <div>
+            <div class="node-sub">mental</div>
             <div class="node-label">Esprit</div>
             <input class="stat-input" type="number" value="14" min="0" />
           </div>
@@ -193,7 +193,12 @@ document.querySelector('#app').innerHTML = `
       </div>
 
       <div class="sub-row bottom">
-        ${coeurCorpsSkills.map(subItem).join('')}
+        <div class="sub-column">
+          ${coeurCorpsSkills.slice(0, 2).map(subItem).join('')}
+        </div>
+        <div class="sub-column">
+          ${coeurCorpsSkills.slice(2).map(subItem).join('')}
+        </div>
       </div>
     </div>
 
@@ -225,14 +230,14 @@ document.querySelector('#app').innerHTML = `
       <div class="panel-title">Sortilèges</div>
       <ul class="spell-list">
         ${['Éclair silencieux', 'Barrière d’ombre', 'Transmutation lunaire', 'Portail d’éther', '', '', '']
-          .map(
-            (v) => `
+    .map(
+      (v) => `
           <li class="spell-row">
             <button type="button" class="diamond" aria-label="maîtrisé"></button>
             <input class="line-input" type="text" value="${v}" />
           </li>`
-          )
-          .join('')}
+    )
+    .join('')}
       </ul>
       <p class="spell-note"><span class="diamond" style="pointer-events:none"></span> si sortilège est maîtrisé</p>
     </article>
