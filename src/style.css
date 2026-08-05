@@ -60,37 +60,60 @@ button {
 
 .title-banner {
   text-align: center;
-  margin-bottom: 22px;
-  padding-bottom: 18px;
+  margin: 0 0 22px;
+  padding: 24px 0 20px;
   border-bottom: 2px solid var(--line-strong);
   position: relative;
+}
+
+.title-banner::before,
+.title-banner::after {
+  content: "";
+  position: absolute;
+  top: 34px;
+  width: 22%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--ink-soft) 35%, var(--ink-soft) 65%, transparent 100%);
+  opacity: 0.65;
+}
+
+.title-banner::before {
+  left: 4%;
+}
+
+.title-banner::after {
+  right: 4%;
 }
 
 .title-banner .eyebrow {
   display: block;
   font-family: var(--display);
-  font-style: italic;
-  font-size: 1.05rem;
+  font-style: normal;
+  font-size: 0.95rem;
   color: var(--ink-soft);
-  letter-spacing: 0.04em;
-  margin-bottom: 2px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
 }
 
 .title-banner h1 {
   margin: 0;
-  font-family: var(--display);
-  font-weight: 700;
-  font-size: clamp(2.6rem, 6vw, 4.4rem);
-  letter-spacing: 0.16em;
+  font-family: "Cinzel Decorative", var(--display);
+  font-weight: 900;
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  line-height: 0.9;
   color: var(--ink);
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.55), 0 3px 8px rgba(44, 34, 16, 0.18);
 }
 
 .title-banner .ornament {
   display: block;
-  margin: 6px auto 0;
-  width: 200px;
-  height: 10px;
-  color: var(--gold);
+  margin: 10px auto 0;
+  width: 140px;
+  height: 6px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
 }
 
 .toggle-edit {
@@ -392,12 +415,15 @@ button {
 .core-triangle {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(90px, 0.35fr) minmax(340px, 2.6fr) minmax(90px, 0.35fr);
+  width: min-content;
+  max-width: 100%;
+  justify-self: center;
+  grid-template-columns: min-content auto min-content;
   grid-template-areas: "left frame right" ". bottom .";
   row-gap: 24px;
-  column-gap: 64px;
+  column-gap: 16px;
   align-items: center;
-  padding: 4px 0 6px;
+  padding: 0px 0 6px;
 }
 
 .side-list {
@@ -409,18 +435,17 @@ button {
 
 .side-list.right {
   grid-area: right;
-  position: absolute;
-  top: 25%;
-  right: 160%;
-  width: 150px;
+  justify-items: start;
+  width: 100%;
+  max-width: 130px;
+  margin-left: -75px;
 }
 
 .side-list.left {
+  grid-area: left;
   justify-items: end;
-  position: absolute;
-  top: 25%;
-  left: 10%;
-  width: max-content;
+  width: 100%;
+  max-width: 100px;
 }
 
 .side-list.right {
@@ -481,6 +506,7 @@ button {
   max-width: 720px;
   aspect-ratio: 1 / 1;
   margin: 10px auto 0;
+  transform: translateX(50px);
 }
 
 .triangle-lines {
@@ -579,11 +605,11 @@ button {
 }
 
 .node-coeur {
-  left: -20%;
+  left: -15%;
 }
 
 .node-corps {
-  right: -10%;
+  left: 75%;
 }
 
 .edge-icon {
@@ -608,7 +634,7 @@ button {
 }
 
 .icon-top {
-  top: 40%;
+  top: 39%;
   left: 30%;
 }
 
@@ -625,38 +651,32 @@ button {
 .sub-row.bottom {
   grid-area: bottom;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px 28px;
-  max-width: 350px;
+  grid-template-columns: repeat(2, max-content);
+  gap: 12px 20px;
   margin: 0;
-  margin-left: -60px;
-  justify-items: stretch;
-  justify-self: start;
+  justify-content: flex-end;
 }
 
 .sub-row.bottom .sub-column {
   display: grid;
   gap: 12px;
+  width: max-content;
 }
 
 .sub-row.bottom .sub-column .substat {
-  display: grid;
-  grid-template-columns: auto 56px;
+  display: flex;
   align-items: center;
-  gap: 8px;
-  width: 100%;
+  gap: 10px;
 }
 
 .sub-row.bottom .sub-column .substat span {
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-width: 0;
 }
 
 .sub-row.bottom .sub-column .substat-input {
   width: 52px;
   flex: none;
+  margin-left: auto;
 }
 
 /* ---------- Traits ---------- */
@@ -861,20 +881,33 @@ button {
   }
 
   .core-triangle {
-    grid-template-columns: 1fr;
+    grid-template-columns: min-content auto min-content;
     grid-template-areas:
-      "frame"
-      "left"
-      "right"
-      "bottom";
-    row-gap: 28px;
+      "left frame right"
+      ". bottom .";
+    row-gap: 20px;
+    column-gap: 18px;
+    justify-self: center;
   }
 
   .triangle-frame {
-    margin-top: 46px;
+    margin: 0;
+    width: min(100%, 340px);
+    max-width: 340px;
   }
 
   .side-list {
+    justify-items: start !important;
+    position: relative;
+    width: min-content;
+    max-width: 140px;
+  }
+
+  .side-list.left {
+    justify-items: end !important;
+  }
+
+  .side-list.right {
     justify-items: start !important;
   }
 
@@ -883,7 +916,38 @@ button {
     flex-direction: row;
   }
 
-  .triangle-frame {
-    max-width: 340px;
+  .node-esprit {
+    top: 16%;
+    left: 30%;
+  }
+
+  .node-magie {
+    top: 65%;
+    left: 30%;
+  }
+
+  .node-coeur {
+    top: 90%;
+    left: -15%;
+  }
+
+  .node-corps {
+    top: 90%;
+    left: 75%;
+  }
+
+  .icon-top {
+    top: 39%;
+    left: 30%;
+  }
+
+  .icon-left {
+    top: 79%;
+    left: 5%;
+  }
+
+  .icon-right {
+    top: 79%;
+    left: 55%;
   }
 }

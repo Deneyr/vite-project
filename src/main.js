@@ -144,12 +144,12 @@ document.querySelector('#app').innerHTML = `
 
       <div class="triangle-frame">
         <svg class="triangle-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
-          <path class="edge-line" d="M30 18 L-20 90" />
-          <path class="edge-line" d="M30 18 L80 90" />
+          <path class="edge-line" d="M30 16 L-15 90" />
+          <path class="edge-line" d="M30 16 L75 90" />
           <path class="edge-line" d="M-15 90 L75 90" />
-          <line class="spoke-line" x1="30" y1="18" x2="30" y2="64" />
-          <line class="spoke-line" x1="-15" y1="90" x2="30" y2="64" />
-          <line class="spoke-line" x1="75" y1="90" x2="30" y2="64" />
+          <line class="spoke-line" x1="30" y1="16" x2="30" y2="65" />
+          <line class="spoke-line" x1="-15" y1="90" x2="30" y2="65" />
+          <line class="spoke-line" x1="75" y1="90" x2="30" y2="65" />
         </svg>
 
         <div class="node-circle node-esprit">
