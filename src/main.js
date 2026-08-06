@@ -80,10 +80,20 @@ document.querySelector('#app').innerHTML = `
     <button id="toggle-edit" class="toggle-edit">Édition</button>
   </header>
 
+  <div class="tabs-bar">
+    <button type="button" class="tab-button active" data-tab="overview">Fiche</button>
+    <button type="button" class="tab-button" data-tab="house">Maison</button>
+    <button type="button" class="tab-button" data-tab="magie">Magie</button>
+    <button type="button" class="tab-button" data-tab="inventaire">Inventaire</button>
+  </div>
+
+  <div class="tabs-content">
+    <section class="tab-panel active" data-tab="overview">
+
   <section class="top-grid">
     <div class="parchment-block identity-block">
       <span class="block-label">Personnage</span>
-      <div class="field-row"><span>Joueuse / joueur</span><input class="input-field" type="text" value="Aria Valion" /></div>
+      <div class="field-row"><span>Nom</span><input class="input-field" type="text" value="Aria Valion" /></div>
       <div class="field-row"><span>Table</span><input class="input-field" type="text" value="L’Académie" /></div>
       <div class="field-row"><span>Époque</span><input class="input-field" type="text" value="Renaissance magique" /></div>
     </div>
@@ -99,24 +109,52 @@ document.querySelector('#app').innerHTML = `
 
     <div class="parchment-block school-block">
       <span class="block-label">Année scolaire</span>
-      <strong class="school-status">en cours</strong>
+      <div class="school-status">
+        <span class="school-status-text">en cours</span>
+        <select class="year-input" aria-label="Année scolaire en cours">
+          <option value="1" selected>1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+        </select>
+      </div>
       <div class="track-row"><span>B.U.S.E</span><input class="mini-input" type="text" value="_/_" /></div>
       <div class="track-row"><span>A.S.P.I.C</span><input class="mini-input" type="text" value="_/_" /></div>
     </div>
 
-    <div class="parchment-block house-block">
-      <svg class="shield-icon" viewBox="0 0 84 100" aria-hidden="true">
-        <path d="M42 4 L74 18 L74 52 C74 74 58 92 42 98 C26 92 10 74 10 52 L10 18 Z" fill="none" stroke="currentColor" stroke-width="5"/>
-        <path d="M42 20 L42 62" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="42" cy="40" r="6" fill="currentColor"/>
-      </svg>
+    <div class="parchment-block house-block griffondor">
+      <div class="house-shield">
+        <svg class="shield-icon" viewBox="0 0 84 100" aria-hidden="true">
+          <path d="M42 4 L74 18 L74 52 C74 74 58 92 42 98 C26 92 10 74 10 52 L10 18 Z" fill="none" stroke="currentColor" stroke-width="5"/>
+          <path d="M42 20 L42 62" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="42" cy="40" r="6" fill="currentColor"/>
+        </svg>
+        <select class="house-select" aria-label="Choisir le blason de maison">
+          <option value="griffondor" selected>Griffondor</option>
+          <option value="serpentard">Serpentard</option>
+          <option value="poufsouffle">Poufsouffle</option>
+          <option value="serdaigle">Serdaigle</option>
+        </select>
+      </div>
       <div class="house-action">
         <span>Action de Maison</span>
         <input class="mini-input" type="number" value="5" />
       </div>
       <div class="points-eveil">
-        <span>Points d’éveil</span>
-        <input class="input-field" type="number" value="0" min="0" />
+        <span class="points-title">Points d’éveil</span>
+        <div class="points-grid">
+          <div class="points-column">
+            <div class="points-value"><input class="mini-input" type="number" value="3" min="0" /></div>
+            <div class="points-label">Restant</div>
+          </div>
+          <div class="points-column">
+            <div class="points-value"><input class="mini-input" type="number" value="2" min="0" /></div>
+            <div class="points-label">Dépensé</div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -260,7 +298,24 @@ document.querySelector('#app').innerHTML = `
       </div>
     </article>
   </section>
-
+  <section class="tab-panel" data-tab="house">
+    <div class="placeholder-panel">
+      <div class="placeholder-title">Maison</div>
+      <p>Contenu de l’onglet Maison à compléter ici pour le choix de la maison.</p>
+    </div>
+  </section>
+  <section class="tab-panel" data-tab="magie">
+    <div class="placeholder-panel">
+      <div class="placeholder-title">Magie</div>
+      <p>Onglet Magie pour le grimoire et les sorts.</p>
+    </div>
+  </section>
+  <section class="tab-panel" data-tab="inventaire">
+    <div class="placeholder-panel">
+      <div class="placeholder-title">Inventaire</div>
+      <p>Onglet Inventaire pour gérer l’équipement et les objets.</p>
+    </div>
+  </section>
 </div>
 `
 
@@ -291,19 +346,45 @@ originPips.forEach((pip) => {
   })
 })
 
+const houseBlock = document.querySelector('.house-block')
+const houseSelect = document.querySelector('.house-select')
+if (houseSelect) {
+  houseSelect.addEventListener('change', () => {
+    houseBlock.classList.remove('griffondor', 'serpentard', 'poufsouffle', 'serdaigle')
+    houseBlock.classList.add(houseSelect.value)
+  })
+}
+
+const tabButtons = document.querySelectorAll('.tab-button')
+const tabPanels = document.querySelectorAll('.tab-panel')
+if (tabButtons.length && tabPanels.length) {
+  tabButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const tab = button.dataset.tab
+      tabButtons.forEach((btn) => btn.classList.toggle('active', btn === button))
+      tabPanels.forEach((panel) => panel.classList.toggle('active', panel.dataset.tab === tab))
+    })
+  })
+}
+
 // érudition / énergie / possessions icons: simple toggle
 document.querySelectorAll('.tracker-icons .icon-toggle, .possessions-rail .icon-toggle').forEach((btn) => {
   btn.addEventListener('click', () => btn.classList.toggle('on'))
 })
 
 const toggleEditBtn = document.querySelector('#toggle-edit')
-const editableFields = Array.from(document.querySelectorAll('.input-field, .mini-input, .line-input, .textarea-field, .stat-input, .substat-input'))
+const editableFields = Array.from(document.querySelectorAll('.input-field, .mini-input, .line-input, .textarea-field, .stat-input, .substat-input, .year-input, .house-select'))
 let readonlyMode = true
 
 const setReadonly = (readonly) => {
   readonlyMode = readonly
   editableFields.forEach((field) => {
-    field.readOnly = readonly
+    if ('readOnly' in field) {
+      field.readOnly = readonly
+    }
+    if (field.tagName === 'SELECT') {
+      field.disabled = readonly
+    }
     field.classList.toggle('readonly-field', readonly)
   })
   toggleEditBtn.textContent = readonly ? 'Édition' : 'Verrouiller'
