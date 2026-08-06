@@ -145,8 +145,8 @@ document.querySelector('#app').innerHTML = `
       <div class="character-portrait">
         <div class="portrait-frame">
             <div class="portrait-placeholder">
-            <img src="/portrait.svg" alt="Portrait d'exemple" />
-          </div>
+              <img src="/portrait.svg" alt="Portrait d'exemple" />
+            </div>
         </div>
       </div>
     </div>
