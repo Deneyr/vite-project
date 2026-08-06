@@ -171,8 +171,8 @@ button {
 
 .toggle-edit {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: -8px;
+  right: 10px;
   padding: 8px 18px;
   border-radius: 999px;
   border: 1.5px solid var(--line-strong);
@@ -194,7 +194,7 @@ button {
 
 .top-grid {
   display: grid;
-  grid-template-columns: 1.4fr 0.85fr 0.85fr 0.95fr;
+  grid-template-columns: 1.8fr 1fr;
   gap: 18px;
   align-items: stretch;
   margin-bottom: 18px;
@@ -206,6 +206,49 @@ button {
   background: var(--paper);
   padding: 16px 18px;
   box-shadow: var(--shadow-soft);
+}
+
+.character-block {
+  display: grid;
+  grid-template-columns: 1.3fr 0.85fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.character-info {
+  display: grid;
+  gap: 18px;
+}
+
+.character-portrait {
+  display: grid;
+  gap: 18px;
+  justify-content: center;
+}
+
+.identity-main {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+}
+
+.identity-side {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  width: 100%;
+}
+
+.sub-section {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: rgba(243, 234, 212, 0.95);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-soft);
+}
+
+.sub-section .block-label {
+  margin-bottom: 10px;
 }
 
 .block-label {
@@ -234,6 +277,37 @@ button {
   font-size: 0.92rem;
 }
 
+.identity-main .field-row:first-child span,
+.identity-main .field-row:first-child input {
+  font-family: "Cinzel Decorative", var(--display);
+}
+
+.identity-main .field-row:first-child span {
+  font-size: 1rem;
+  color: var(--ink);
+  letter-spacing: 0.1em;
+}
+
+.identity-main .field-row:first-child input {
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  padding: 4px 0 6px;
+  border-radius: 0;
+  box-shadow: inset 0 -1px 0 rgba(107, 90, 58, 0.12);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  background-image: linear-gradient(90deg, rgba(107, 90, 58, 0.05) 0%, rgba(107, 90, 58, 0.5) 30%, rgba(107, 90, 58, 1) 50%, rgba(107, 90, 58, 0.5) 70%, rgba(107, 90, 58, 0.05) 100%);
+  background-position: bottom;
+  background-repeat: no-repeat;
+  background-size: 100% 2px;
+}
+
+.identity-main .field-row:first-child input.readonly-field {
+  background: transparent;
+}
 
 .origin-block {
   display: flex;
@@ -265,6 +339,59 @@ button {
 
 .school-block {
   text-align: center;
+}
+
+.portrait-block {
+  display: grid;
+  gap: 20px;
+  justify-items: stretch;
+  text-align: center;
+  min-height: 100%;
+  width: 100%;
+}
+
+.portrait-frame {
+  width: 100%;
+  min-height: 100%;
+  height: 100%;
+  border: 1px solid var(--line);
+  border-radius: calc(var(--radius-sm) * 1.2);
+  background: rgba(255, 255, 255, 0.95);
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.portrait-placeholder {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  border: 1px dashed var(--line);
+  border-radius: calc(var(--radius-sm) * 0.9);
+  display: grid;
+  place-items: center;
+  color: var(--ink-soft);
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+.portrait-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.portrait-placeholder {
+  width: 100%;
+  height: 100%;
+  border: 1px dashed var(--line);
+  border-radius: calc(var(--radius-sm) * 0.9);
+  display: grid;
+  place-items: center;
+  color: var(--ink-soft);
+  font-style: italic;
+  font-size: 0.95rem;
 }
 
 .school-block .block-label {
@@ -324,6 +451,31 @@ button {
   margin-bottom: 8px;
 }
 
+.track-split {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+}
+
+.track-split .mini-input {
+  max-width: 28px;
+  padding: 0 2px 2px;
+}
+
+.track-split .mini-input:first-child {
+  padding-right: 1px;
+}
+
+.track-split .mini-input:last-child {
+  padding-left: 1px;
+}
+
+.track-sep {
+  color: var(--ink-soft);
+  font-weight: 700;
+  margin: 0 2px;
+}
+
 .house-block {
   display: grid;
   grid-template-columns: 1fr;
@@ -359,6 +511,7 @@ button {
   background: rgba(255, 255, 255, 0.92);
   appearance: none;
   cursor: pointer;
+  text-align: center;
 }
 
 .house-select:focus {
@@ -507,7 +660,18 @@ button {
   font-family: var(--serif);
 }
 
-.readonly-field {
+/* Make the ambition textarea compact and non-resizable while allowing wrap */
+.ambition-row .textarea-field {
+  min-height: 40px;
+  resize: none;
+  overflow: auto;
+}
+
+.input-field.readonly-field,
+.mini-input.readonly-field,
+.line-input.readonly-field,
+.textarea-field.readonly-field,
+.stat-input.readonly-field {
   border-bottom-color: transparent;
   background: transparent;
 }
@@ -561,7 +725,16 @@ button {
   cursor: pointer;
   padding: 0;
   display: inline-block;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.readonly-mode .diamond {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.readonly-mode .origin-pip {
+  cursor: not-allowed;
 }
 
 .diamond.on {
@@ -854,6 +1027,15 @@ button {
   padding-left: 20px;
 }
 
+.traits-note {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  margin-top: 10px;
+  padding-left: 8px;
+  line-height: 1.25;
+  font-style: italic;
+}
+
 .traits-panel .block-label {
   font-family: var(--display);
   font-weight: 700;
@@ -959,7 +1141,8 @@ button {
   margin: 0 0 10px;
   padding: 0;
   display: grid;
-  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 24px;
 }
 
 .spell-row {
@@ -970,14 +1153,28 @@ button {
 
 .spell-row .line-input {
   flex: 1;
+  border-bottom: 1px solid rgba(44, 34, 16, 0.2);
+  padding: 4px 2px 2px;
+}
+
+.spell-row .line-input.readonly-field {
+  border-bottom-color: rgba(44, 34, 16, 0.2);
 }
 
 .spell-note {
-  font-size: 0.76rem;
+  font-size: 0.68rem;
   color: var(--ink-soft);
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
+  margin-top: 18px;
+  padding-left: 12px;
+}
+
+.spell-note .diamond {
+  transform: rotate(45deg) scale(0.82);
+  display: inline-block;
+  margin-right: 4px;
 }
 
 .possessions-panel {

@@ -91,38 +91,63 @@ document.querySelector('#app').innerHTML = `
     <section class="tab-panel active" data-tab="overview">
 
   <section class="top-grid">
-    <div class="parchment-block identity-block">
-      <span class="block-label">Personnage</span>
-      <div class="field-row"><span>Nom</span><input class="input-field" type="text" value="Aria Valion" /></div>
-      <div class="field-row"><span>Table</span><input class="input-field" type="text" value="L’Académie" /></div>
-      <div class="field-row"><span>Époque</span><input class="input-field" type="text" value="Renaissance magique" /></div>
-    </div>
-
-    <div class="parchment-block origin-block">
-      <span class="block-label">Origine</span>
-      <div class="origin-options">
-        <label class="origin-choice"><span class="diamond origin-pip"></span>Né-Moldu</label>
-        <label class="origin-choice"><span class="diamond origin-pip"></span>Sang-Mêlé</label>
-        <label class="origin-choice"><span class="diamond origin-pip"></span>Sang-Pur</label>
+    <div class="parchment-block character-block">
+      <div class="character-info">
+        <span class="block-label">Personnage</span>
+        <div class="identity-main">
+          <div class="field-row"><span>Nom</span><input class="input-field" type="text" value="Aria Valion" /></div>
+          <div class="field-row"><span>Table</span><input class="input-field" type="text" value="L’Académie" /></div>
+          <div class="field-row"><span>Époque</span><input class="input-field" type="text" value="Renaissance magique" /></div>
+        </div>
+        <div class="identity-side">
+          <div class="sub-section origin-block">
+            <span class="block-label">Origine</span>
+            <div class="origin-options">
+              <label class="origin-choice"><span class="diamond origin-pip on"></span>Né-Moldu</label>
+              <label class="origin-choice"><span class="diamond origin-pip"></span>Sang-Mêlé</label>
+              <label class="origin-choice"><span class="diamond origin-pip"></span>Sang-Pur</label>
+            </div>
+          </div>
+          <div class="sub-section school-block">
+            <span class="block-label">Année scolaire</span>
+            <div class="school-status">
+              <span class="school-status-text">en cours</span>
+              <select class="year-input" aria-label="Année scolaire en cours">
+                <option value="1" selected>1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+              </select>
+            </div>
+            <div class="track-row">
+              <span>B.U.S.E</span>
+              <div class="track-split">
+                <input class="mini-input" type="text" value="_" />
+                <span class="track-sep">/</span>
+                <input class="mini-input" type="text" value="_" />
+              </div>
+            </div>
+            <div class="track-row">
+              <span>A.S.P.I.C</span>
+              <div class="track-split">
+                <input class="mini-input" type="text" value="_" />
+                <span class="track-sep">/</span>
+                <input class="mini-input" type="text" value="_" />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-
-    <div class="parchment-block school-block">
-      <span class="block-label">Année scolaire</span>
-      <div class="school-status">
-        <span class="school-status-text">en cours</span>
-        <select class="year-input" aria-label="Année scolaire en cours">
-          <option value="1" selected>1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-          <option value="6">6</option>
-          <option value="7">7</option>
-        </select>
+      <div class="character-portrait">
+        <div class="portrait-frame">
+          <div class="portrait-placeholder">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 360 480'%3E%3Crect width='360' height='480' rx='28' fill='%23f6e7d7'/%3E%3Ccircle cx='180' cy='160' r='80' fill='%23d0b18e'/%3E%3Cpath d='M110 310c0-60 140-60 140 0v24H110v-24z' fill='%23d0b18e'/%3E%3Crect x='96' y='362' width='168' height='96' rx='24' fill='%23b3936d'/%3E%3C/svg%3E" alt="Portrait d'exemple" />
+          </div>
+        </div>
       </div>
-      <div class="track-row"><span>B.U.S.E</span><input class="mini-input" type="text" value="_/_" /></div>
-      <div class="track-row"><span>A.S.P.I.C</span><input class="mini-input" type="text" value="_/_" /></div>
     </div>
 
     <div class="parchment-block house-block griffondor">
@@ -161,7 +186,7 @@ document.querySelector('#app').innerHTML = `
 
   <section class="ambition-row">
     <span class="block-label">Ambition</span>
-    <input class="line-input" type="text" value="Découvrir l’ancien savoir des sorciers et changer le destin du monde." />
+    <textarea class="line-input textarea-field" rows="2">Découvrir l’ancien savoir des sorciers et changer le destin du monde.</textarea>
   </section>
 
   <section class="skills-and-core">
@@ -169,7 +194,7 @@ document.querySelector('#app').innerHTML = `
       <ul class="skill-list">
         ${mainCourses.map(skillRow).join('')}
       </ul>
-      <p class="skill-note">1ère &amp; 2nde année : 7 cours principaux + vol · 3ème année : 2 cours secondaires au choix minimum · Nul (-2) / Moyen (0) / Bon (2) / Excellent (4) / Génie (6)</p>
+      <p class="skill-note">1ère &amp; 2nde année : 7 cours principaux + vol<br>3ème année : 2 cours secondaires au choix minimum<br>Nul (-2) / Moyen (0) / Bon (2) / Excellent (4) / Génie (6)</p>
       <ul class="skill-list">
         ${secondaryCourses.map(skillRow).join('')}
       </ul>
@@ -246,6 +271,8 @@ document.querySelector('#app').innerHTML = `
         ${Array.from({ length: 7 }, () => '<div class="trait-line"></div>').join('')}
       </div>
     </div>
+    <p class="traits-note">1d20 + Caract. Principale + Compétence
+      <br>Relance = Caract. Secondaire · Score Magie ajouté quand utilisée · Double 1 = Catastrophe</p>
   </section>
 
   <section class="trackers-row">
@@ -267,7 +294,30 @@ document.querySelector('#app').innerHTML = `
     <article class="panel spells-panel">
       <div class="panel-title">Sortilèges</div>
       <ul class="spell-list">
-        ${['Éclair silencieux', 'Barrière d’ombre', 'Transmutation lunaire', 'Portail d’éther', '', '', '']
+        ${[
+    'Éclair silencieux',
+    'Barrière d’ombre',
+    'Transmutation lunaire',
+    'Portail d’éther',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    ''
+  ]
     .map(
       (v) => `
           <li class="spell-row">
@@ -277,7 +327,7 @@ document.querySelector('#app').innerHTML = `
     )
     .join('')}
       </ul>
-      <p class="spell-note"><span class="diamond" style="pointer-events:none"></span> si sortilège est maîtrisé</p>
+      <p class="spell-note"><span class="diamond on" style="pointer-events:none"></span> si sortilège est maîtrisé</p>
     </article>
 
     <article class="panel possessions-panel">
@@ -326,6 +376,7 @@ document.querySelectorAll('.pip-row').forEach((row) => {
   const pips = Array.from(row.querySelectorAll('.diamond'))
   pips.forEach((pip, index) => {
     pip.addEventListener('click', () => {
+      if (readonlyMode) return
       const alreadyFull = pip.classList.contains('on') && (pips[index + 1] ? !pips[index + 1].classList.contains('on') : true)
       pips.forEach((p, i) => p.classList.toggle('on', alreadyFull ? i < index : i <= index))
     })
@@ -334,13 +385,17 @@ document.querySelectorAll('.pip-row').forEach((row) => {
 
 // single mastery pip per spell just toggles on/off
 document.querySelectorAll('.spell-row .diamond').forEach((pip) => {
-  pip.addEventListener('click', () => pip.classList.toggle('on'))
+  pip.addEventListener('click', () => {
+    if (readonlyMode) return
+    pip.classList.toggle('on')
+  })
 })
 
 // origin: single-select among the three choices
 const originPips = document.querySelectorAll('.origin-pip')
 originPips.forEach((pip) => {
   pip.addEventListener('click', () => {
+    if (readonlyMode) return
     originPips.forEach((p) => p.classList.remove('on'))
     pip.classList.add('on')
   })
@@ -378,6 +433,7 @@ let readonlyMode = true
 
 const setReadonly = (readonly) => {
   readonlyMode = readonly
+  document.body.classList.toggle('readonly-mode', readonly)
   editableFields.forEach((field) => {
     if ('readOnly' in field) {
       field.readOnly = readonly

@@ -6,7 +6,7 @@
         "title": "Hello, World!",
         "icon": "/icon.svg",
         "popover": "/",
-        "height": 600,
-        "width": 500
+        "height": 800,
+        "width": 600
     }
 }
