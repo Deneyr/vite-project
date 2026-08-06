@@ -653,6 +653,21 @@ button {
   font-weight: 700;
 }
 
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+input[type=number]:focus::-webkit-inner-spin-button,
+input[type=number]:focus::-webkit-outer-spin-button {
+  opacity: 1;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
 .textarea-field {
   resize: vertical;
   min-height: 70px;
