@@ -82,9 +82,10 @@ document.querySelector('#app').innerHTML = `
 
   <div class="tabs-bar">
     <button type="button" class="tab-button active" data-tab="overview">Fiche</button>
-    <button type="button" class="tab-button" data-tab="house">Maison</button>
-    <button type="button" class="tab-button" data-tab="magie">Magie</button>
-    <button type="button" class="tab-button" data-tab="inventaire">Inventaire</button>
+    <button type="button" class="tab-button" data-tab="bibliotheque">Bibliothèque</button>
+    <button type="button" class="tab-button" data-tab="relations">Relations</button>
+    <button type="button" class="tab-button" data-tab="constellations">Constellations</button>
+    <button type="button" class="tab-button" data-tab="familiers">Familiers</button>
   </div>
 
   <div class="tabs-content">
@@ -341,22 +342,28 @@ document.querySelector('#app').innerHTML = `
       </div>
     </article>
   </section>
-  <section class="tab-panel" data-tab="house">
+  <section class="tab-panel" data-tab="bibliotheque">
     <div class="placeholder-panel">
-      <div class="placeholder-title">Maison</div>
-      <p>Contenu de l’onglet Maison à compléter ici pour le choix de la maison.</p>
+      <div class="placeholder-title">Bibliothèque</div>
+      <p>Contenu de l’onglet Bibliothèque à compléter ici pour les grimoires et références.</p>
     </div>
   </section>
-  <section class="tab-panel" data-tab="magie">
+  <section class="tab-panel" data-tab="relations">
     <div class="placeholder-panel">
-      <div class="placeholder-title">Magie</div>
-      <p>Onglet Magie pour le grimoire et les sorts.</p>
+      <div class="placeholder-title">Relations</div>
+      <p>Contenu de l’onglet Relations à compléter ici pour les alliés, rivaux et contacts.</p>
     </div>
   </section>
-  <section class="tab-panel" data-tab="inventaire">
+  <section class="tab-panel" data-tab="constellations">
     <div class="placeholder-panel">
-      <div class="placeholder-title">Inventaire</div>
-      <p>Onglet Inventaire pour gérer l’équipement et les objets.</p>
+      <div class="placeholder-title">Constellations</div>
+      <p>Contenu de l’onglet Constellations à compléter ici pour les cartes célestes et signes.</p>
+    </div>
+  </section>
+  <section class="tab-panel" data-tab="familiers">
+    <div class="placeholder-panel">
+      <div class="placeholder-title">Familiers</div>
+      <p>Contenu de l’onglet Familiers à compléter ici pour les créatures et compagnons.</p>
     </div>
   </section>
 </div>
@@ -421,7 +428,7 @@ document.querySelectorAll('.tracker-icons .icon-toggle').forEach((btn) => {
 })
 
 const toggleEditBtn = document.querySelector('#toggle-edit')
-const editableFields = Array.from(document.querySelectorAll('.input-field, .mini-input, .line-input, .textarea-field, .stat-input, .substat-input, .year-input, .house-select'))
+const editableFields = Array.from(document.querySelectorAll('.input-field, .mini-input, .line-input, .textarea-field, .stat-input, .substat-input, .year-input, .house-select, .trait-input'))
 let readonlyMode = true
 
 const setReadonly = (readonly) => {
