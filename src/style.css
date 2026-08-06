@@ -1064,6 +1064,23 @@ input[type=number] {
 .trait-line {
   border-bottom: 1px solid var(--line);
   min-height: 26px;
+  display: flex;
+  align-items: center;
+}
+
+.trait-input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  padding: 4px 0;
+  font: inherit;
+  color: var(--ink);
+}
+
+.trait-input:focus {
+  outline: none;
+  border-bottom-color: var(--accent);
 }
 
 .traits-list {
@@ -1190,18 +1207,6 @@ input[type=number] {
   transform: rotate(45deg) scale(0.82);
   display: inline-block;
   margin-right: 4px;
-}
-
-.possessions-panel {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 56px;
-  gap: 16px;
-}
-
-.possessions-rail {
-  display: grid;
-  align-content: start;
-  gap: 12px;
 }
 
 .pages-block {

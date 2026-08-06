@@ -268,7 +268,7 @@ document.querySelector('#app').innerHTML = `
     <div class="traits-panel">
       <span class="block-label">Traits</span>
       <div class="traits-list">
-        ${Array.from({ length: 7 }, () => '<div class="trait-line"></div>').join('')}
+        ${Array.from({ length: 7 }, () => '<div class="trait-line"><input class="trait-input" type="text" title="" /></div>').join('')}
       </div>
     </div>
     <p class="traits-note">1d20 + Caract. Principale + Compétence
@@ -338,13 +338,6 @@ document.querySelector('#app').innerHTML = `
           <div class="panel-title">Pages</div>
           <textarea class="textarea-field" placeholder="Notes, journal, pages arrachées du grimoire..."></textarea>
         </div>
-      </div>
-      <div class="possessions-rail">
-        <button type="button" class="icon-toggle">${diceIcon()}</button>
-        <button type="button" class="icon-toggle">${bookIcon()}</button>
-        <button type="button" class="icon-toggle">${chessIcon()}</button>
-        <button type="button" class="icon-toggle">${flaskIcon()}</button>
-        <button type="button" class="icon-toggle">${personIcon()}</button>
       </div>
     </article>
   </section>
@@ -422,8 +415,8 @@ if (tabButtons.length && tabPanels.length) {
   })
 }
 
-// érudition / énergie / possessions icons: simple toggle
-document.querySelectorAll('.tracker-icons .icon-toggle, .possessions-rail .icon-toggle').forEach((btn) => {
+// érudition / énergie icons: simple toggle
+document.querySelectorAll('.tracker-icons .icon-toggle').forEach((btn) => {
   btn.addEventListener('click', () => btn.classList.toggle('on'))
 })
 
