@@ -697,6 +697,13 @@ input[type=number] {
   border-bottom-color: var(--line);
 }
 
+/* Remove underline for the static house action value */
+.house-action .action-value,
+.mini-input.always-readonly.action-value {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
 /* ---------- Skills + core layout ---------- */
 
 .skills-and-core {

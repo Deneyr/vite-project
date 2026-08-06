@@ -1,4 +1,5 @@
 import './style.css'
+import portraitImg from './assets/portrait.svg'
 import gryffImg from './assets/Gryffondor.png'
 import serpImg from './assets/Serpentard.png'
 import poufImg from './assets/Poufsouffle.png'
@@ -156,7 +157,7 @@ document.querySelector('#app').innerHTML = `
       <div class="character-portrait">
         <div class="portrait-frame">
             <div class="portrait-placeholder">
-              <img src="/portrait.svg" alt="Portrait d'exemple" />
+              <img src="${portraitImg}" alt="Portrait d'exemple" />
             </div>
         </div>
       </div>
@@ -174,7 +175,7 @@ document.querySelector('#app').innerHTML = `
       </div>
       <div class="house-action">
         <span>Action de Maison</span>
-        <input class="mini-input" type="number" value="5" />
+        <div class="mini-input always-readonly action-value" aria-hidden="true">+5</div>
       </div>
       <div class="points-eveil">
         <span class="points-title">Points d’éveil</span>
@@ -439,7 +440,7 @@ document.querySelectorAll('.tracker-icons .icon-toggle').forEach((btn) => {
 })
 
 const toggleEditBtn = document.querySelector('#toggle-edit')
-const editableFields = Array.from(document.querySelectorAll('.input-field, .mini-input, .line-input, .textarea-field, .stat-input, .substat-input, .year-input, .house-select, .trait-input'))
+const editableFields = Array.from(document.querySelectorAll('.input-field:not(.always-readonly), .mini-input:not(.always-readonly), .line-input:not(.always-readonly), .textarea-field:not(.always-readonly), .stat-input:not(.always-readonly), .substat-input:not(.always-readonly), .year-input:not(.always-readonly), .house-select:not(.always-readonly), .trait-input:not(.always-readonly)'))
 let readonlyMode = true
 
 const setReadonly = (readonly) => {
