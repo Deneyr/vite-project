@@ -1,5 +1,4 @@
 import './style.css'
-import portraitImg from './assets/portrait.svg'
 
 /* ---------- data ---------- */
 
@@ -145,8 +144,8 @@ document.querySelector('#app').innerHTML = `
       </div>
       <div class="character-portrait">
         <div class="portrait-frame">
-          <div class="portrait-placeholder">
-            <img src="${portraitImg}" alt="Portrait d'exemple" />
+            <div class="portrait-placeholder">
+            <img src="/portrait.svg" alt="Portrait d'exemple" />
           </div>
         </div>
       </div>
