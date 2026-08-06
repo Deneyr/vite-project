@@ -691,6 +691,11 @@ input[type=number] {
   background: transparent;
 }
 
+/* Keep a visible underline for the small track inputs when in readonly mode */
+.track-split .mini-input.readonly-field {
+  border-bottom-color: var(--line);
+}
+
 /* ---------- Skills + core layout ---------- */
 
 .skills-and-core {

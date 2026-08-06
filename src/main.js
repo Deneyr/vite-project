@@ -1,4 +1,5 @@
 import './style.css'
+import portraitImg from './assets/portrait.svg'
 
 /* ---------- data ---------- */
 
@@ -126,17 +127,17 @@ document.querySelector('#app').innerHTML = `
             <div class="track-row">
               <span>B.U.S.E</span>
               <div class="track-split">
-                <input class="mini-input" type="text" value="_" />
+                <input class="mini-input" type="text" value="" />
                 <span class="track-sep">/</span>
-                <input class="mini-input" type="text" value="_" />
+                <input class="mini-input" type="text" value="" />
               </div>
             </div>
             <div class="track-row">
               <span>A.S.P.I.C</span>
               <div class="track-split">
-                <input class="mini-input" type="text" value="_" />
+                <input class="mini-input" type="text" value="" />
                 <span class="track-sep">/</span>
-                <input class="mini-input" type="text" value="_" />
+                <input class="mini-input" type="text" value="" />
               </div>
             </div>
           </div>
@@ -145,7 +146,7 @@ document.querySelector('#app').innerHTML = `
       <div class="character-portrait">
         <div class="portrait-frame">
           <div class="portrait-placeholder">
-            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 360 480'%3E%3Crect width='360' height='480' rx='28' fill='%23f6e7d7'/%3E%3Ccircle cx='180' cy='160' r='80' fill='%23d0b18e'/%3E%3Cpath d='M110 310c0-60 140-60 140 0v24H110v-24z' fill='%23d0b18e'/%3E%3Crect x='96' y='362' width='168' height='96' rx='24' fill='%23b3936d'/%3E%3C/svg%3E" alt="Portrait d'exemple" />
+            <img src="${portraitImg}" alt="Portrait d'exemple" />
           </div>
         </div>
       </div>
