@@ -1,4 +1,15 @@
 import './style.css'
+import gryffImg from './assets/Gryffondor.png'
+import serpImg from './assets/Serpentard.png'
+import poufImg from './assets/Poufsouffle.png'
+import serdImg from './assets/Serdaigle.png'
+
+const houseImages = {
+  griffondor: gryffImg,
+  serpentard: serpImg,
+  poufsouffle: poufImg,
+  serdaigle: serdImg,
+}
 
 /* ---------- data ---------- */
 
@@ -151,15 +162,11 @@ document.querySelector('#app').innerHTML = `
       </div>
     </div>
 
-    <div class="parchment-block house-block griffondor">
+      <div class="parchment-block house-block griffondor">
       <div class="house-shield">
-        <svg class="shield-icon" viewBox="0 0 84 100" aria-hidden="true">
-          <path d="M42 4 L74 18 L74 52 C74 74 58 92 42 98 C26 92 10 74 10 52 L10 18 Z" fill="none" stroke="currentColor" stroke-width="5"/>
-          <path d="M42 20 L42 62" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
-          <circle cx="42" cy="40" r="6" fill="currentColor"/>
-        </svg>
+        <img class="shield-icon" src="${houseImages.griffondor}" alt="Blason de maison" />
         <select class="house-select" aria-label="Choisir le blason de maison">
-          <option value="griffondor" selected>Griffondor</option>
+          <option value="griffondor" selected>Gryffondor</option>
           <option value="serpentard">Serpentard</option>
           <option value="poufsouffle">Poufsouffle</option>
           <option value="serdaigle">Serdaigle</option>
@@ -407,6 +414,10 @@ if (houseSelect) {
   houseSelect.addEventListener('change', () => {
     houseBlock.classList.remove('griffondor', 'serpentard', 'poufsouffle', 'serdaigle')
     houseBlock.classList.add(houseSelect.value)
+    const shieldImg = houseBlock.querySelector('.shield-icon')
+    if (shieldImg && houseImages[houseSelect.value]) {
+      shieldImg.src = houseImages[houseSelect.value]
+    }
   })
 }
 

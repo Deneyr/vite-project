@@ -491,11 +491,12 @@ button {
 }
 
 .shield-icon {
-  width: 76px;
-  height: 92px;
+  width: 120px;
+  height: 146px;
   color: currentColor;
   stroke: currentColor;
   fill: none;
+  object-fit: contain;
 }
 
 .house-select {
