@@ -81,6 +81,30 @@ const personIcon = () => `
   <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c1.2-4 4-6 7-6s5.8 2 7 6"/></svg>
 `
 
+const wandIcon = () => `
+  <svg viewBox="0 0 24 24"><path d="M3 21 14 10" stroke-linecap="round"/><path d="M17 2l1.1 2.9L21 6l-2.9 1.1L17 10l-1.1-2.9L13 6l2.9-1.1Z" stroke-linejoin="round"/><path d="M14.5 3.2v1.8M19.5 8.5h1.8" stroke-linecap="round"/></svg>
+`
+
+const grimoireCard = (title, used = 0, total = 10) => `
+  <article class="grimoire-card">
+    <div class="grimoire-title">
+      <span class="grimoire-title-line"></span>
+      <input class="line-input grimoire-title-input" type="text" value="${title}" style="width: ${title.length + 2}ch" />
+      <span class="grimoire-title-line"></span>
+    </div>
+    <textarea class="grimoire-notes" rows="6" placeholder=""></textarea>
+    <div class="grimoire-footer">
+      <div class="grimoire-badge">${bookIcon()}</div>
+      <div class="grimoire-ticket">
+        <input class="mini-input grimoire-ticket-input" type="number" value="${used}" min="0" />
+        <span>/</span>
+        <input class="mini-input grimoire-ticket-input" type="number" value="${total}" min="0" />
+      </div>
+      <span class="grimoire-footer-line"></span>
+    </div>
+  </article>
+`
+
 /* ---------- markup ---------- */
 
 document.querySelector('#app').innerHTML = `
@@ -103,207 +127,229 @@ document.querySelector('#app').innerHTML = `
   <div class="tabs-content">
     <section class="tab-panel active" data-tab="overview">
 
-  <section class="top-grid">
-    <div class="parchment-block character-block">
-      <div class="character-info">
-        <span class="block-label">Personnage</span>
-        <div class="identity-main">
-          <div class="field-row"><span>Nom</span><input class="input-field" type="text" value="Aria Valion" /></div>
-          <div class="field-row"><span>Table</span><input class="input-field" type="text" value="L’Académie" /></div>
-          <div class="field-row"><span>Époque</span><input class="input-field" type="text" value="Renaissance magique" /></div>
-        </div>
-        <div class="identity-side">
-          <div class="sub-section origin-block">
-            <span class="block-label">Origine</span>
-            <div class="origin-options">
-              <label class="origin-choice"><span class="diamond origin-pip on"></span>Né-Moldu</label>
-              <label class="origin-choice"><span class="diamond origin-pip"></span>Sang-Mêlé</label>
-              <label class="origin-choice"><span class="diamond origin-pip"></span>Sang-Pur</label>
-            </div>
-          </div>
-          <div class="sub-section school-block">
-            <span class="block-label">Année scolaire</span>
-            <div class="school-status">
-              <span class="school-status-text">en cours</span>
-              <select class="year-input" aria-label="Année scolaire en cours">
-                <option value="1" selected>1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-              </select>
-            </div>
-            <div class="track-row">
-              <span>B.U.S.E</span>
-              <div class="track-split">
-                <input class="mini-input" type="text" value="" />
-                <span class="track-sep">/</span>
-                <input class="mini-input" type="text" value="" />
+      <section class="top-grid">
+        <div class="parchment-block character-block">
+          <div class="character-top">
+            <div class="character-info">
+              <span class="block-label">Personnage</span>
+              <div class="identity-main">
+                <div class="field-row">
+                  <span>Nom</span>
+                  <div class="name-with-sex">
+                    <input class="input-field" type="text" value="Aria Valion" />
+                    <select class="sex-select" aria-label="Sexe">
+                      <option value="F" selected>♀</option>
+                      <option value="M">♂</option>
+                      <option value="A">?</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="field-row"><span>Table</span><input class="input-field" type="text" value="L’Académie" /></div>
+                <div class="field-row"><span>Époque</span><input class="input-field" type="text" value="Renaissance magique" /></div>
+                <div class="field-row ambition-field-row">
+                  <span>Ambition</span>
+                  <textarea class="line-input textarea-field" rows="2">Découvrir l’ancien savoir des sorciers et changer le destin du monde.</textarea>
+                </div>
               </div>
             </div>
-            <div class="track-row">
-              <span>A.S.P.I.C</span>
-              <div class="track-split">
-                <input class="mini-input" type="text" value="" />
-                <span class="track-sep">/</span>
-                <input class="mini-input" type="text" value="" />
+            <div class="character-portrait">
+              <div class="portrait-frame">
+                  <div class="portrait-placeholder">
+                    <img src="${portraitImg}" alt="Portrait d'exemple" />
+                  </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-      <div class="character-portrait">
-        <div class="portrait-frame">
-            <div class="portrait-placeholder">
-              <img src="${portraitImg}" alt="Portrait d'exemple" />
+          <div class="identity-side">
+            <div class="sub-section origin-block">
+              <span class="block-label">Origine</span>
+              <div class="origin-options">
+                <label class="origin-choice"><span class="diamond origin-pip on"></span>Né-Moldu</label>
+                <label class="origin-choice"><span class="diamond origin-pip"></span>Sang-Mêlé</label>
+                <label class="origin-choice"><span class="diamond origin-pip"></span>Sang-Pur</label>
+              </div>
             </div>
-        </div>
-      </div>
-    </div>
-
-      <div class="parchment-block house-block griffondor">
-      <div class="house-shield">
-        <img class="shield-icon" src="${houseImages.griffondor}" alt="Blason de maison" />
-        <select class="house-select" aria-label="Choisir le blason de maison">
-          <option value="griffondor" selected>Gryffondor</option>
-          <option value="serpentard">Serpentard</option>
-          <option value="poufsouffle">Poufsouffle</option>
-          <option value="serdaigle">Serdaigle</option>
-        </select>
-      </div>
-      <div class="house-action">
-        <span>Action de Maison</span>
-        <div class="mini-input always-readonly action-value" aria-hidden="true">+5</div>
-      </div>
-      <div class="points-eveil">
-        <span class="points-title">Points d’éveil</span>
-        <div class="points-grid">
-          <div class="points-column">
-            <div class="points-value"><input class="mini-input" type="number" value="3" min="0" /></div>
-            <div class="points-label">Restant</div>
-          </div>
-          <div class="points-column">
-            <div class="points-value"><input class="mini-input" type="number" value="2" min="0" /></div>
-            <div class="points-label">Dépensé</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="ambition-row">
-    <span class="block-label">Ambition</span>
-    <textarea class="line-input textarea-field" rows="2">Découvrir l’ancien savoir des sorciers et changer le destin du monde.</textarea>
-  </section>
-
-  <section class="skills-and-core">
-    <div class="skills-col">
-      <ul class="skill-list">
-        ${mainCourses.map(skillRow).join('')}
-      </ul>
-      <p class="skill-note">1ère &amp; 2nde année : 7 cours principaux + vol<br>3ème année : 2 cours secondaires au choix minimum<br>Nul (-2) / Moyen (0) / Bon (2) / Excellent (4) / Génie (6)</p>
-      <ul class="skill-list">
-        ${secondaryCourses.map(skillRow).join('')}
-      </ul>
-    </div>
-
-    <div class="core-triangle">
-      <div class="side-list left">
-        ${espritSkillsLeft.map(subItem).join('')}
-      </div>
-
-      <div class="triangle-frame">
-        <svg class="triangle-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
-          <path class="edge-line" d="M30 16 L-15 90" />
-          <path class="edge-line" d="M30 16 L75 90" />
-          <path class="edge-line" d="M-15 90 L75 90" />
-          <line class="spoke-line" x1="30" y1="16" x2="30" y2="65" />
-          <line class="spoke-line" x1="-15" y1="90" x2="30" y2="65" />
-          <line class="spoke-line" x1="75" y1="90" x2="30" y2="65" />
-        </svg>
-
-        <div class="node-circle node-esprit">
-          <div>
-            <div class="node-sub">mental</div>
-            <div class="node-label">Esprit</div>
-            <input class="stat-input" type="number" value="14" min="0" />
+            <div class="sub-section school-block">
+              <span class="block-label">Année scolaire</span>
+              <div class="school-status">
+                <span class="school-status-text">en cours</span>
+                <select class="year-input" aria-label="Année scolaire en cours">
+                  <option value="1" selected>1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                </select>
+              </div>
+              <div class="track-row">
+                <span>B.U.S.E</span>
+                <div class="track-split">
+                  <input class="mini-input" type="text" value="" />
+                  <span class="track-sep">/</span>
+                  <input class="mini-input" type="text" value="" />
+                </div>
+              </div>
+              <div class="track-row">
+                <span>A.S.P.I.C</span>
+                <div class="track-split">
+                  <input class="mini-input" type="text" value="" />
+                  <span class="track-sep">/</span>
+                  <input class="mini-input" type="text" value="" />
+                </div>
+              </div>
+            </div>
+            <div class="sub-section wand-block">
+              <div class="wand-header">
+                <span class="wand-badge">${wandIcon()}</span>
+                <span class="block-label">Baguette magique</span>
+              </div>
+              <div class="wand-fields">
+                <div class="field-row"><span>Bois</span><input class="input-field" type="text" value="Houx" /></div>
+                <div class="field-row"><span>Cœur</span><input class="input-field" type="text" value="Plume de phénix" /></div>
+                <div class="field-row"><span>Taille</span><input class="input-field" type="number" value="28" min="0" /></div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="node-circle node-magie">
-          <div>
-            <div class="node-label">Magie</div>
-            <input class="stat-input" type="number" value="16" min="0" />
+          <div class="parchment-block house-block griffondor">
+          <div class="house-shield">
+            <img class="shield-icon" src="${houseImages.griffondor}" alt="Blason de maison" />
+            <select class="house-select" aria-label="Choisir le blason de maison">
+              <option value="griffondor" selected>Gryffondor</option>
+              <option value="serpentard">Serpentard</option>
+              <option value="poufsouffle">Poufsouffle</option>
+              <option value="serdaigle">Serdaigle</option>
+            </select>
+          </div>
+          <div class="house-action">
+            <span>Action de Maison</span>
+            <div class="mini-input always-readonly action-value" aria-hidden="true">+5</div>
+          </div>
+          <div class="points-eveil">
+            <span class="points-title">Points d’éveil</span>
+            <div class="points-grid">
+              <div class="points-column">
+                <div class="points-value"><input class="mini-input" type="number" value="3" min="0" /></div>
+                <div class="points-label">Restant</div>
+              </div>
+              <div class="points-column">
+                <div class="points-value"><input class="mini-input" type="number" value="2" min="0" /></div>
+                <div class="points-label">Dépensé</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="skills-and-core">
+        <div class="skills-col">
+          <ul class="skill-list">
+            ${mainCourses.map(skillRow).join('')}
+          </ul>
+          <p class="skill-note">1ère &amp; 2nde année : 7 cours principaux + vol<br>3ème année : 2 cours secondaires au choix minimum<br>Nul (-2) / Moyen (0) / Bon (2) / Excellent (4) / Génie (6)</p>
+          <ul class="skill-list">
+            ${secondaryCourses.map(skillRow).join('')}
+          </ul>
+        </div>
+
+        <div class="core-triangle">
+          <div class="side-list left">
+            ${espritSkillsLeft.map(subItem).join('')}
+          </div>
+
+          <div class="triangle-frame">
+            <svg class="triangle-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <path class="edge-line" d="M30 16 L-15 90" />
+              <path class="edge-line" d="M30 16 L75 90" />
+              <path class="edge-line" d="M-15 90 L75 90" />
+              <line class="spoke-line" x1="30" y1="16" x2="30" y2="65" />
+              <line class="spoke-line" x1="-15" y1="90" x2="30" y2="65" />
+              <line class="spoke-line" x1="75" y1="90" x2="30" y2="65" />
+            </svg>
+
+            <div class="node-circle node-esprit">
+              <div>
+                <div class="node-sub">mental</div>
+                <div class="node-label">Esprit</div>
+                <input class="stat-input" type="number" value="14" min="0" />
+              </div>
+            </div>
+
+            <div class="node-circle node-magie">
+              <div>
+                <div class="node-label">Magie</div>
+                <input class="stat-input" type="number" value="16" min="0" />
+              </div>
+            </div>
+
+            <div class="node-circle node-coeur">
+              <div>
+                <div class="node-sub">social</div>
+                <div class="node-label">Cœur</div>
+                <input class="stat-input" type="number" value="12" min="0" />
+              </div>
+            </div>
+
+            <div class="node-circle node-corps">
+              <div>
+                <div class="node-sub">physique</div>
+                <div class="node-label">Corps</div>
+                <input class="stat-input" type="number" value="13" min="0" />
+              </div>
+            </div>
+
+            <div class="edge-icon icon-top">${bookIcon()}</div>
+            <div class="edge-icon icon-left">${personIcon()}</div>
+            <div class="edge-icon icon-right">${boltIcon()}</div>
+          </div>
+
+          <div class="side-list right">
+            ${espritSkillsRight.map(subItem).join('')}
+          </div>
+
+          <div class="sub-row bottom">
+            <div class="sub-column">
+              ${coeurCorpsSkills.slice(0, 2).map(subItem).join('')}
+            </div>
+            <div class="sub-column">
+              ${coeurCorpsSkills.slice(2).map(subItem).join('')}
+            </div>
           </div>
         </div>
 
-        <div class="node-circle node-coeur">
-          <div>
-            <div class="node-sub">social</div>
-            <div class="node-label">Cœur</div>
-            <input class="stat-input" type="number" value="12" min="0" />
+        <div class="traits-panel">
+          <span class="block-label">Traits</span>
+          <div class="traits-list">
+            ${Array.from({ length: 7 }, () => '<div class="trait-line"><input class="trait-input" type="text" title="" /></div>').join('')}
           </div>
         </div>
+        <p class="traits-note">1d20 + Caract. Principale + Compétence
+          <br>Relance = Caract. Secondaire · Score Magie ajouté quand utilisée · Double 1 = Catastrophe</p>
+      </section>
 
-        <div class="node-circle node-corps">
-          <div>
-            <div class="node-sub">physique</div>
-            <div class="node-label">Corps</div>
-            <input class="stat-input" type="number" value="13" min="0" />
+      <section class="trackers-row">
+        <div class="tracker erudition">
+          <span class="tracker-label">Érudition</span>
+          <div class="tracker-icons">
+            ${Array.from({ length: 5 }, () => `<button type="button" class="icon-toggle">${bookIcon()}</button>`).join('')}
           </div>
         </div>
-
-        <div class="edge-icon icon-top">${bookIcon()}</div>
-        <div class="edge-icon icon-left">${personIcon()}</div>
-        <div class="edge-icon icon-right">${boltIcon()}</div>
-      </div>
-
-      <div class="side-list right">
-        ${espritSkillsRight.map(subItem).join('')}
-      </div>
-
-      <div class="sub-row bottom">
-        <div class="sub-column">
-          ${coeurCorpsSkills.slice(0, 2).map(subItem).join('')}
+        <div class="tracker energie">
+          <div class="tracker-icons">
+            ${Array.from({ length: 4 }, () => `<button type="button" class="icon-toggle">${boltIcon()}</button>`).join('')}
+          </div>
+          <span class="tracker-label">Énergie</span>
         </div>
-        <div class="sub-column">
-          ${coeurCorpsSkills.slice(2).map(subItem).join('')}
-        </div>
-      </div>
-    </div>
+      </section>
 
-    <div class="traits-panel">
-      <span class="block-label">Traits</span>
-      <div class="traits-list">
-        ${Array.from({ length: 7 }, () => '<div class="trait-line"><input class="trait-input" type="text" title="" /></div>').join('')}
-      </div>
-    </div>
-    <p class="traits-note">1d20 + Caract. Principale + Compétence
-      <br>Relance = Caract. Secondaire · Score Magie ajouté quand utilisée · Double 1 = Catastrophe</p>
-  </section>
-
-  <section class="trackers-row">
-    <div class="tracker erudition">
-      <span class="tracker-label">Érudition</span>
-      <div class="tracker-icons">
-        ${Array.from({ length: 5 }, () => `<button type="button" class="icon-toggle">${bookIcon()}</button>`).join('')}
-      </div>
-    </div>
-    <div class="tracker energie">
-      <div class="tracker-icons">
-        ${Array.from({ length: 4 }, () => `<button type="button" class="icon-toggle">${boltIcon()}</button>`).join('')}
-      </div>
-      <span class="tracker-label">Énergie</span>
-    </div>
-  </section>
-
-  <section class="bottom-grid">
-    <article class="panel spells-panel">
-      <div class="panel-title">Sortilèges</div>
-      <ul class="spell-list">
-        ${[
+      <section class="bottom-grid">
+        <article class="panel spells-panel">
+          <div class="panel-title">Sortilèges</div>
+          <ul class="spell-list">
+            ${[
     'Éclair silencieux',
     'Barrière d’ombre',
     'Transmutation lunaire',
@@ -329,51 +375,55 @@ document.querySelector('#app').innerHTML = `
   ]
     .map(
       (v) => `
-          <li class="spell-row">
-            <button type="button" class="diamond" aria-label="maîtrisé"></button>
-            <input class="line-input" type="text" value="${v}" />
-          </li>`
+              <li class="spell-row">
+                <button type="button" class="diamond" aria-label="maîtrisé"></button>
+                <input class="line-input" type="text" value="${v}" />
+              </li>`
     )
     .join('')}
-      </ul>
-      <p class="spell-note"><span class="diamond on" style="pointer-events:none"></span> si sortilège est maîtrisé</p>
-    </article>
+          </ul>
+          <p class="spell-note"><span class="diamond on" style="pointer-events:none"></span> si sortilège est maîtrisé</p>
+        </article>
 
-    <article class="panel possessions-panel">
-      <div>
-        <div class="panel-title">Possessions</div>
-        <textarea class="textarea-field" rows="5">Grimoire ancien, baguette d’onyx, cape d’invisibilité, orbe des rêves, potion de régénération.</textarea>
-        <div class="pages-block">
-          <div class="panel-title">Pages</div>
-          <textarea class="textarea-field" placeholder="Notes, journal, pages arrachées du grimoire..."></textarea>
-        </div>
+        <article class="panel possessions-panel">
+          <div>
+            <div class="panel-title">Possessions</div>
+            <textarea class="textarea-field" rows="5">Grimoire ancien, baguette d’onyx, cape d’invisibilité, orbe des rêves, potion de régénération.</textarea>
+            <div class="pages-block">
+              <div class="panel-title">Pages</div>
+              <textarea class="textarea-field" placeholder="Notes, journal, pages arrachées du grimoire..."></textarea>
+            </div>
+          </div>
+        </article>
+      </section>
+    </section>
+    <section class="tab-panel" data-tab="bibliotheque">
+      <div class="grimoire-grid">
+        ${grimoireCard('Bibliothèque', 3, 10)}
+        ${grimoireCard('Grimoire des Sortilèges', 5, 12)}
+        ${grimoireCard('Carnet de Recherche', 1, 6)}
+        ${grimoireCard('Almanach Céleste', 0, 8)}
       </div>
-    </article>
-  </section>
-  <section class="tab-panel" data-tab="bibliotheque">
-    <div class="placeholder-panel">
-      <div class="placeholder-title">Bibliothèque</div>
-      <p>Contenu de l’onglet Bibliothèque à compléter ici pour les grimoires et références.</p>
-    </div>
-  </section>
-  <section class="tab-panel" data-tab="relations">
-    <div class="placeholder-panel">
-      <div class="placeholder-title">Relations</div>
-      <p>Contenu de l’onglet Relations à compléter ici pour les alliés, rivaux et contacts.</p>
-    </div>
-  </section>
-  <section class="tab-panel" data-tab="constellations">
-    <div class="placeholder-panel">
-      <div class="placeholder-title">Constellations</div>
-      <p>Contenu de l’onglet Constellations à compléter ici pour les cartes célestes et signes.</p>
-    </div>
-  </section>
-  <section class="tab-panel" data-tab="familiers">
-    <div class="placeholder-panel">
-      <div class="placeholder-title">Familiers</div>
-      <p>Contenu de l’onglet Familiers à compléter ici pour les créatures et compagnons.</p>
-    </div>
-  </section>
+    </section>
+    <section class="tab-panel" data-tab="relations">
+      <div class="placeholder-panel">
+        <div class="placeholder-title">Relations</div>
+        <p>Contenu de l’onglet Relations à compléter ici pour les alliés, rivaux et contacts.</p>
+      </div>
+    </section>
+    <section class="tab-panel" data-tab="constellations">
+      <div class="placeholder-panel">
+        <div class="placeholder-title">Constellations</div>
+        <p>Contenu de l’onglet Constellations à compléter ici pour les cartes célestes et signes.</p>
+      </div>
+    </section>
+    <section class="tab-panel" data-tab="familiers">
+      <div class="placeholder-panel">
+        <div class="placeholder-title">Familiers</div>
+        <p>Contenu de l’onglet Familiers à compléter ici pour les créatures et compagnons.</p>
+      </div>
+    </section>
+  </div>
 </div>
 `
 
@@ -440,7 +490,7 @@ document.querySelectorAll('.tracker-icons .icon-toggle').forEach((btn) => {
 })
 
 const toggleEditBtn = document.querySelector('#toggle-edit')
-const editableFields = Array.from(document.querySelectorAll('.input-field:not(.always-readonly), .mini-input:not(.always-readonly), .line-input:not(.always-readonly), .textarea-field:not(.always-readonly), .stat-input:not(.always-readonly), .substat-input:not(.always-readonly), .year-input:not(.always-readonly), .house-select:not(.always-readonly), .trait-input:not(.always-readonly)'))
+const editableFields = Array.from(document.querySelectorAll('.input-field:not(.always-readonly), .mini-input:not(.always-readonly), .line-input:not(.always-readonly), .textarea-field:not(.always-readonly), .stat-input:not(.always-readonly), .substat-input:not(.always-readonly), .year-input:not(.always-readonly), .house-select:not(.always-readonly), .trait-input:not(.always-readonly), .grimoire-notes:not(.always-readonly), .sex-select:not(.always-readonly)'))
 let readonlyMode = true
 
 const setReadonly = (readonly) => {

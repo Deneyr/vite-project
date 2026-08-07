@@ -109,6 +109,166 @@ button {
   margin-bottom: 10px;
 }
 
+/* ---------- Grimoire cards (Bibliotheque tab) ---------- */
+
+.grimoire-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+  align-items: start;
+}
+
+.grimoire-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 360px;
+  border: 2px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+  padding: 22px 20px 18px;
+  box-shadow: var(--shadow-soft);
+}
+
+.grimoire-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: none;
+  margin-bottom: 18px;
+}
+
+.grimoire-title-line {
+  flex: 1;
+  min-width: 10px;
+  height: 2px;
+  background: var(--ink-soft);
+  opacity: 0.55;
+}
+
+.grimoire-title-input {
+  flex: none;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  text-align: center;
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: 1.15rem;
+  letter-spacing: 0.05em;
+  padding: 2px 4px;
+}
+
+.grimoire-title-input:focus {
+  border: none;
+  background: var(--accent-soft);
+  border-radius: 4px;
+}
+
+.grimoire-notes {
+  flex: 1;
+  min-height: 180px;
+  width: 100%;
+  resize: none;
+  border: none;
+  background-color: transparent;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 31px,
+    var(--line) 31px,
+    var(--line) 32px
+  );
+  background-size: 100% 32px;
+  background-position: 0 4px;
+  line-height: 32px;
+  padding: 0 2px;
+  margin-bottom: 18px;
+  font-family: var(--serif);
+  font-size: 0.98rem;
+  color: var(--ink);
+}
+
+.grimoire-notes:focus {
+  outline: none;
+  background-color: var(--accent-soft);
+}
+
+.grimoire-footer {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: none;
+  min-width: 0;
+}
+
+.grimoire-badge {
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border: 2px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--paper-strong);
+  color: var(--ink);
+  display: grid;
+  place-items: center;
+}
+
+.grimoire-badge svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
+}
+
+.grimoire-ticket {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 20px 6px 12px;
+  border: 2px solid var(--line-strong);
+  background: var(--paper-strong);
+  clip-path: polygon(0 0, 82% 0, 100% 50%, 82% 100%, 0 100%);
+  font-family: var(--display);
+  font-weight: 700;
+}
+
+.grimoire-ticket span {
+  color: var(--ink-soft);
+}
+
+.grimoire-ticket-input {
+  width: 26px;
+  flex: none;
+  text-align: center;
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+
+.grimoire-ticket-input:focus {
+  border: none;
+  background: var(--accent-soft);
+}
+
+.grimoire-footer-line {
+  flex: 1;
+  min-width: 0;
+  height: 0;
+  align-self: flex-end;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+@media (max-width: 640px) {
+  .grimoire-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 /* ---------- Title ---------- */
 
 .title-banner {
@@ -210,6 +370,11 @@ button {
 
 .character-block {
   display: grid;
+  gap: 18px;
+}
+
+.character-top {
+  display: grid;
   grid-template-columns: 1.3fr 0.85fr;
   gap: 18px;
   align-items: start;
@@ -226,15 +391,97 @@ button {
   justify-content: center;
 }
 
+.wand-block {
+  width: 100%;
+}
+
+.wand-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.wand-badge {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border: 2px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--paper-strong);
+  color: var(--ink);
+  display: grid;
+  place-items: center;
+}
+
+.wand-badge svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  fill: none;
+}
+
+.wand-fields .field-row {
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.wand-fields .field-row span {
+  font-size: 0.82rem;
+}
+
+.wand-fields .input-field {
+  font-size: 0.9rem;
+}
+
 .identity-main {
   display: grid;
   gap: 12px;
   width: 100%;
 }
 
+.name-with-sex {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.name-with-sex .input-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.sex-select {
+  flex: none;
+  width: 46px;
+  font: inherit;
+  font-size: 1.15rem;
+  text-align: center;
+  color: var(--ink);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  padding: 2px 0 4px;
+  cursor: pointer;
+}
+
+.sex-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.sex-select.readonly-field {
+  border-bottom-color: transparent;
+  background: transparent;
+  cursor: default;
+}
+
 .identity-side {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
   width: 100%;
 }
@@ -601,18 +848,14 @@ button {
 
 /* ---------- Ambition ---------- */
 
-.ambition-row {
-  display: grid;
-  grid-template-columns: 140px minmax(0, 1fr);
-  align-items: baseline;
-  gap: 12px;
-  padding: 4px 4px 20px;
-  border-bottom: 1.5px solid var(--line);
-  margin-bottom: 22px;
+.ambition-field-row {
+  align-items: start;
 }
 
-.ambition-row .block-label {
-  margin: 0;
+.ambition-field-row .textarea-field {
+  min-height: 40px;
+  resize: none;
+  overflow: auto;
 }
 
 /* ---------- Inputs ---------- */
@@ -677,12 +920,6 @@ input[type=number] {
 }
 
 /* Make the ambition textarea compact and non-resizable while allowing wrap */
-.ambition-row .textarea-field {
-  min-height: 40px;
-  resize: none;
-  overflow: auto;
-}
-
 .input-field.readonly-field,
 .mini-input.readonly-field,
 .line-input.readonly-field,
@@ -1259,6 +1496,14 @@ input[type=number] {
   }
 
   .top-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .character-top {
+    grid-template-columns: 1fr;
+  }
+
+  .identity-side {
     grid-template-columns: 1fr;
   }
 
