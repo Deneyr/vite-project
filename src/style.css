@@ -173,13 +173,11 @@ button {
   resize: none;
   border: none;
   background-color: transparent;
-  background-image: repeating-linear-gradient(
-    to bottom,
-    transparent,
-    transparent 31px,
-    var(--line) 31px,
-    var(--line) 32px
-  );
+  background-image: repeating-linear-gradient(to bottom,
+      transparent,
+      transparent 31px,
+      var(--line) 31px,
+      var(--line) 32px);
   background-size: 100% 32px;
   background-position: 0 4px;
   line-height: 32px;
@@ -392,7 +390,8 @@ button {
 }
 
 .wand-block {
-  width: 100%;
+  flex: none;
+  width: 250px;
 }
 
 .wand-header {
@@ -480,10 +479,10 @@ button {
 }
 
 .identity-side {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+  display: flex;
+  gap: 10px;
   width: 100%;
+  overflow-x: auto;
 }
 
 .sub-section {
@@ -563,6 +562,8 @@ button {
   justify-content: center;
   gap: 14px;
   text-align: center;
+  flex: none;
+  width: 150px;
 }
 
 .origin-options {
@@ -586,6 +587,8 @@ button {
 
 .school-block {
   text-align: center;
+  flex: none;
+  width: 150px;
 }
 
 .portrait-block {
@@ -705,8 +708,18 @@ button {
 }
 
 .track-split .mini-input {
-  max-width: 28px;
+  max-width: 34px;
   padding: 0 2px 2px;
+}
+
+.track-split .mini-input::-webkit-inner-spin-button,
+.track-split .mini-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.track-split .mini-input {
+  -moz-appearance: textfield;
 }
 
 .track-split .mini-input:first-child {
@@ -1500,10 +1513,6 @@ input[type=number] {
   }
 
   .character-top {
-    grid-template-columns: 1fr;
-  }
-
-  .identity-side {
     grid-template-columns: 1fr;
   }
 

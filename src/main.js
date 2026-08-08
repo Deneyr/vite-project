@@ -186,17 +186,17 @@ document.querySelector('#app').innerHTML = `
               <div class="track-row">
                 <span>B.U.S.E</span>
                 <div class="track-split">
-                  <input class="mini-input" type="text" value="" />
+                  <input class="mini-input" type="number" min="0" value="" />
                   <span class="track-sep">/</span>
-                  <input class="mini-input" type="text" value="" />
+                  <input class="mini-input" type="number" min="0" value="" />
                 </div>
               </div>
               <div class="track-row">
                 <span>A.S.P.I.C</span>
                 <div class="track-split">
-                  <input class="mini-input" type="text" value="" />
+                  <input class="mini-input" type="number" min="0" value="" />
                   <span class="track-sep">/</span>
-                  <input class="mini-input" type="text" value="" />
+                  <input class="mini-input" type="number" min="0" value="" />
                 </div>
               </div>
             </div>
