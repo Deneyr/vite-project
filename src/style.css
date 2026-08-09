@@ -327,10 +327,15 @@ button {
   background: linear-gradient(90deg, transparent, var(--gold), transparent);
 }
 
-.toggle-edit {
+.edit-controls {
   position: absolute;
   top: -8px;
   right: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.toggle-edit {
   padding: 8px 18px;
   border-radius: 999px;
   border: 1.5px solid var(--line-strong);
@@ -339,13 +344,30 @@ button {
   font-family: var(--serif);
   font-size: 0.85rem;
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .toggle-edit:hover {
   background: var(--accent);
   color: var(--paper-strong);
   border-color: var(--accent);
+}
+
+.save-edit {
+  background: var(--accent);
+  color: var(--paper-strong);
+  border-color: var(--accent);
+}
+
+.save-edit:hover {
+  background: #5c2020;
+  border-color: #5c2020;
+}
+
+.cancel-edit:hover {
+  background: var(--paper-deep);
+  color: var(--ink);
+  border-color: var(--line-strong);
 }
 
 /* ---------- Top grid: identity / origin / school / house ---------- */

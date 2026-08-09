@@ -4,6 +4,7 @@ import gryffImg from './assets/Gryffondor.png'
 import serpImg from './assets/Serpentard.png'
 import poufImg from './assets/Poufsouffle.png'
 import serdImg from './assets/Serdaigle.png'
+import { collectState, applyState, StorageAdapter } from './persistence.js'
 
 const houseImages = {
   griffondor: gryffImg,
@@ -39,22 +40,35 @@ const coeurCorpsSkills = ['Décorum', 'Discrétion', 'Persuasion', 'Romance']
 
 const PIPS_PER_SKILL = 6
 
+/* ---------- helpers ---------- */
+
+// Turns "Défense contre les forces du Mal" into "defense-contre-les-forces-du-mal".
+// Used to build stable, readable data-field ids from human labels.
+const slugify = (str) =>
+  str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+
 /* ---------- small render helpers ---------- */
 
-const diamond = () => `<button type="button" class="diamond" aria-label="rang"></button>`
+const diamond = (fieldId) =>
+  `<button type="button" class="diamond" aria-label="rang" data-field="${fieldId}" data-field-type="toggle"></button>`
 
-const pipRow = (count = PIPS_PER_SKILL) =>
-  `<div class="pip-row">${Array.from({ length: count }, diamond).join('')}</div>`
+const pipRow = (fieldBase, count = PIPS_PER_SKILL) =>
+  `<div class="pip-row">${Array.from({ length: count }, (_, i) => diamond(`${fieldBase}.pip.${i}`)).join('')}</div>`
 
 const skillRow = (name) => `
   <li class="skill-row">
     <span class="skill-name">${name}</span>
-    ${pipRow()}
+    ${pipRow(`skill.${slugify(name)}`)}
   </li>
 `
 
 const subItem = (name) => `
-  <div class="substat"><span>${name}</span><input class="substat-input" type="number" min="0" /></div>
+  <div class="substat"><span>${name}</span><input class="substat-input" type="number" min="0" data-field="substat.${slugify(name)}" /></div>
 `
 
 const bookIcon = () => `
@@ -85,20 +99,22 @@ const wandIcon = () => `
   <svg viewBox="0 0 24 24"><path d="M3 21 14 10" stroke-linecap="round"/><path d="M17 2l1.1 2.9L21 6l-2.9 1.1L17 10l-1.1-2.9L13 6l2.9-1.1Z" stroke-linejoin="round"/><path d="M14.5 3.2v1.8M19.5 8.5h1.8" stroke-linecap="round"/></svg>
 `
 
-const grimoireCard = (title, used = 0, total = 10) => `
+// `id` is a stable key for persistence — independent from the title text,
+// so renaming a grimoire later won't orphan its saved notes/counters.
+const grimoireCard = (id, title, used = 0, total = 10) => `
   <article class="grimoire-card">
     <div class="grimoire-title">
       <span class="grimoire-title-line"></span>
-      <input class="line-input grimoire-title-input" type="text" value="${title}" style="width: ${title.length + 2}ch" />
+      <input class="line-input grimoire-title-input" type="text" value="${title}" style="width: ${title.length + 2}ch" data-field="grimoire.${id}.title" />
       <span class="grimoire-title-line"></span>
     </div>
-    <textarea class="grimoire-notes" rows="6" placeholder=""></textarea>
+    <textarea class="grimoire-notes" rows="6" placeholder="" data-field="grimoire.${id}.notes"></textarea>
     <div class="grimoire-footer">
       <div class="grimoire-badge">${bookIcon()}</div>
       <div class="grimoire-ticket">
-        <input class="mini-input grimoire-ticket-input" type="number" value="${used}" min="0" />
+        <input class="mini-input grimoire-ticket-input" type="number" value="${used}" min="0" data-field="grimoire.${id}.used" />
         <span>/</span>
-        <input class="mini-input grimoire-ticket-input" type="number" value="${total}" min="0" />
+        <input class="mini-input grimoire-ticket-input" type="number" value="${total}" min="0" data-field="grimoire.${id}.total" />
       </div>
       <span class="grimoire-footer-line"></span>
     </div>
@@ -113,7 +129,11 @@ document.querySelector('#app').innerHTML = `
   <header class="title-banner">
     <span class="eyebrow">Tu es un</span>
     <h1>Sorcier</h1>
-    <button id="toggle-edit" class="toggle-edit">Édition</button>
+    <div class="edit-controls">
+      <button id="toggle-edit" class="toggle-edit">Édition</button>
+      <button id="save-edit" class="toggle-edit save-edit" hidden>Sauvegarder</button>
+      <button id="cancel-edit" class="toggle-edit cancel-edit" hidden>Annuler</button>
+    </div>
   </header>
 
   <div class="tabs-bar">
@@ -136,19 +156,19 @@ document.querySelector('#app').innerHTML = `
                 <div class="field-row">
                   <span>Nom</span>
                   <div class="name-with-sex">
-                    <input class="input-field" type="text" value="Aria Valion" />
-                    <select class="sex-select" aria-label="Sexe">
+                    <input class="input-field" type="text" value="Aria Valion" data-field="identity.nom" />
+                    <select class="sex-select" aria-label="Sexe" data-field="identity.sexe">
                       <option value="F" selected>♀</option>
                       <option value="M">♂</option>
                       <option value="A">?</option>
                     </select>
                   </div>
                 </div>
-                <div class="field-row"><span>Table</span><input class="input-field" type="text" value="L’Académie" /></div>
-                <div class="field-row"><span>Époque</span><input class="input-field" type="text" value="Renaissance magique" /></div>
+                <div class="field-row"><span>Table</span><input class="input-field" type="text" value="L’Académie" data-field="identity.table" /></div>
+                <div class="field-row"><span>Époque</span><input class="input-field" type="text" value="Renaissance magique" data-field="identity.epoque" /></div>
                 <div class="field-row ambition-field-row">
                   <span>Ambition</span>
-                  <textarea class="line-input textarea-field" rows="2">Découvrir l’ancien savoir des sorciers et changer le destin du monde.</textarea>
+                  <textarea class="line-input textarea-field" rows="2" data-field="identity.ambition">Découvrir l’ancien savoir des sorciers et changer le destin du monde.</textarea>
                 </div>
               </div>
             </div>
@@ -164,16 +184,16 @@ document.querySelector('#app').innerHTML = `
             <div class="sub-section origin-block">
               <span class="block-label">Origine</span>
               <div class="origin-options">
-                <label class="origin-choice"><span class="diamond origin-pip on"></span>Né-Moldu</label>
-                <label class="origin-choice"><span class="diamond origin-pip"></span>Sang-Mêlé</label>
-                <label class="origin-choice"><span class="diamond origin-pip"></span>Sang-Pur</label>
+                <label class="origin-choice"><span class="diamond origin-pip on" data-field="origin.pip.0" data-field-type="toggle"></span>Né-Moldu</label>
+                <label class="origin-choice"><span class="diamond origin-pip" data-field="origin.pip.1" data-field-type="toggle"></span>Sang-Mêlé</label>
+                <label class="origin-choice"><span class="diamond origin-pip" data-field="origin.pip.2" data-field-type="toggle"></span>Sang-Pur</label>
               </div>
             </div>
             <div class="sub-section school-block">
               <span class="block-label">Année scolaire</span>
               <div class="school-status">
                 <span class="school-status-text">en cours</span>
-                <select class="year-input" aria-label="Année scolaire en cours">
+                <select class="year-input" aria-label="Année scolaire en cours" data-field="school.year">
                   <option value="1" selected>1</option>
                   <option value="2">2</option>
                   <option value="3">3</option>
@@ -186,17 +206,17 @@ document.querySelector('#app').innerHTML = `
               <div class="track-row">
                 <span>B.U.S.E</span>
                 <div class="track-split">
-                  <input class="mini-input" type="number" min="0" value="" />
+                  <input class="mini-input" type="number" min="0" value="" data-field="school.buse.1" />
                   <span class="track-sep">/</span>
-                  <input class="mini-input" type="number" min="0" value="" />
+                  <input class="mini-input" type="number" min="0" value="" data-field="school.buse.2" />
                 </div>
               </div>
               <div class="track-row">
                 <span>A.S.P.I.C</span>
                 <div class="track-split">
-                  <input class="mini-input" type="number" min="0" value="" />
+                  <input class="mini-input" type="number" min="0" value="" data-field="school.aspic.1" />
                   <span class="track-sep">/</span>
-                  <input class="mini-input" type="number" min="0" value="" />
+                  <input class="mini-input" type="number" min="0" value="" data-field="school.aspic.2" />
                 </div>
               </div>
             </div>
@@ -206,9 +226,9 @@ document.querySelector('#app').innerHTML = `
                 <span class="block-label">Baguette magique</span>
               </div>
               <div class="wand-fields">
-                <div class="field-row"><span>Bois</span><input class="input-field" type="text" value="Houx" /></div>
-                <div class="field-row"><span>Cœur</span><input class="input-field" type="text" value="Plume de phénix" /></div>
-                <div class="field-row"><span>Taille</span><input class="input-field" type="number" value="28" min="0" /></div>
+                <div class="field-row"><span>Bois</span><input class="input-field" type="text" value="Houx" data-field="wand.bois" /></div>
+                <div class="field-row"><span>Cœur</span><input class="input-field" type="text" value="Plume de phénix" data-field="wand.coeur" /></div>
+                <div class="field-row"><span>Taille</span><input class="input-field" type="number" value="28" min="0" data-field="wand.taille" /></div>
               </div>
             </div>
           </div>
@@ -217,7 +237,7 @@ document.querySelector('#app').innerHTML = `
           <div class="parchment-block house-block griffondor">
           <div class="house-shield">
             <img class="shield-icon" src="${houseImages.griffondor}" alt="Blason de maison" />
-            <select class="house-select" aria-label="Choisir le blason de maison">
+            <select class="house-select" aria-label="Choisir le blason de maison" data-field="house.select">
               <option value="griffondor" selected>Gryffondor</option>
               <option value="serpentard">Serpentard</option>
               <option value="poufsouffle">Poufsouffle</option>
@@ -232,11 +252,11 @@ document.querySelector('#app').innerHTML = `
             <span class="points-title">Points d’éveil</span>
             <div class="points-grid">
               <div class="points-column">
-                <div class="points-value"><input class="mini-input" type="number" value="3" min="0" /></div>
+                <div class="points-value"><input class="mini-input" type="number" value="3" min="0" data-field="house.points.restant" /></div>
                 <div class="points-label">Restant</div>
               </div>
               <div class="points-column">
-                <div class="points-value"><input class="mini-input" type="number" value="2" min="0" /></div>
+                <div class="points-value"><input class="mini-input" type="number" value="2" min="0" data-field="house.points.depense" /></div>
                 <div class="points-label">Dépensé</div>
               </div>
             </div>
@@ -274,14 +294,14 @@ document.querySelector('#app').innerHTML = `
               <div>
                 <div class="node-sub">mental</div>
                 <div class="node-label">Esprit</div>
-                <input class="stat-input" type="number" value="14" min="0" />
+                <input class="stat-input" type="number" value="14" min="0" data-field="core.esprit" />
               </div>
             </div>
 
             <div class="node-circle node-magie">
               <div>
                 <div class="node-label">Magie</div>
-                <input class="stat-input" type="number" value="16" min="0" />
+                <input class="stat-input" type="number" value="16" min="0" data-field="core.magie" />
               </div>
             </div>
 
@@ -289,7 +309,7 @@ document.querySelector('#app').innerHTML = `
               <div>
                 <div class="node-sub">social</div>
                 <div class="node-label">Cœur</div>
-                <input class="stat-input" type="number" value="12" min="0" />
+                <input class="stat-input" type="number" value="12" min="0" data-field="core.coeur" />
               </div>
             </div>
 
@@ -297,7 +317,7 @@ document.querySelector('#app').innerHTML = `
               <div>
                 <div class="node-sub">physique</div>
                 <div class="node-label">Corps</div>
-                <input class="stat-input" type="number" value="13" min="0" />
+                <input class="stat-input" type="number" value="13" min="0" data-field="core.corps" />
               </div>
             </div>
 
@@ -323,7 +343,7 @@ document.querySelector('#app').innerHTML = `
         <div class="traits-panel">
           <span class="block-label">Traits</span>
           <div class="traits-list">
-            ${Array.from({ length: 7 }, () => '<div class="trait-line"><input class="trait-input" type="text" title="" /></div>').join('')}
+            ${Array.from({ length: 7 }, (_, i) => `<div class="trait-line"><input class="trait-input" type="text" title="" data-field="traits.${i}" /></div>`).join('')}
           </div>
         </div>
         <p class="traits-note">1d20 + Caract. Principale + Compétence
@@ -334,12 +354,12 @@ document.querySelector('#app').innerHTML = `
         <div class="tracker erudition">
           <span class="tracker-label">Érudition</span>
           <div class="tracker-icons">
-            ${Array.from({ length: 5 }, () => `<button type="button" class="icon-toggle">${bookIcon()}</button>`).join('')}
+            ${Array.from({ length: 5 }, (_, i) => `<button type="button" class="icon-toggle" data-field="erudition.${i}" data-field-type="toggle">${bookIcon()}</button>`).join('')}
           </div>
         </div>
         <div class="tracker energie">
           <div class="tracker-icons">
-            ${Array.from({ length: 4 }, () => `<button type="button" class="icon-toggle">${boltIcon()}</button>`).join('')}
+            ${Array.from({ length: 4 }, (_, i) => `<button type="button" class="icon-toggle" data-field="energie.${i}" data-field-type="toggle">${boltIcon()}</button>`).join('')}
           </div>
           <span class="tracker-label">Énergie</span>
         </div>
@@ -374,10 +394,10 @@ document.querySelector('#app').innerHTML = `
     ''
   ]
     .map(
-      (v) => `
+      (v, i) => `
               <li class="spell-row">
-                <button type="button" class="diamond" aria-label="maîtrisé"></button>
-                <input class="line-input" type="text" value="${v}" />
+                <button type="button" class="diamond" aria-label="maîtrisé" data-field="spell.${i}.mastered" data-field-type="toggle"></button>
+                <input class="line-input" type="text" value="${v}" data-field="spell.${i}.name" />
               </li>`
     )
     .join('')}
@@ -388,10 +408,10 @@ document.querySelector('#app').innerHTML = `
         <article class="panel possessions-panel">
           <div>
             <div class="panel-title">Possessions</div>
-            <textarea class="textarea-field" rows="5">Grimoire ancien, baguette d’onyx, cape d’invisibilité, orbe des rêves, potion de régénération.</textarea>
+            <textarea class="textarea-field" rows="5" data-field="possessions.items">Grimoire ancien, baguette d’onyx, cape d’invisibilité, orbe des rêves, potion de régénération.</textarea>
             <div class="pages-block">
               <div class="panel-title">Pages</div>
-              <textarea class="textarea-field" placeholder="Notes, journal, pages arrachées du grimoire..."></textarea>
+              <textarea class="textarea-field" placeholder="Notes, journal, pages arrachées du grimoire..." data-field="possessions.pages"></textarea>
             </div>
           </div>
         </article>
@@ -399,10 +419,10 @@ document.querySelector('#app').innerHTML = `
     </section>
     <section class="tab-panel" data-tab="bibliotheque">
       <div class="grimoire-grid">
-        ${grimoireCard('Bibliothèque', 3, 10)}
-        ${grimoireCard('Grimoire des Sortilèges', 5, 12)}
-        ${grimoireCard('Carnet de Recherche', 1, 6)}
-        ${grimoireCard('Almanach Céleste', 0, 8)}
+        ${grimoireCard('bibliotheque', 'Bibliothèque', 3, 10)}
+        ${grimoireCard('grimoire-des-sortileges', 'Grimoire des Sortilèges', 5, 12)}
+        ${grimoireCard('carnet-de-recherche', 'Carnet de Recherche', 1, 6)}
+        ${grimoireCard('almanach-celeste', 'Almanach Céleste', 0, 8)}
       </div>
     </section>
     <section class="tab-panel" data-tab="relations">
@@ -486,10 +506,15 @@ if (tabButtons.length && tabPanels.length) {
 
 // érudition / énergie icons: simple toggle
 document.querySelectorAll('.tracker-icons .icon-toggle').forEach((btn) => {
-  btn.addEventListener('click', () => btn.classList.toggle('on'))
+  btn.addEventListener('click', () => {
+    if (readonlyMode) return
+    btn.classList.toggle('on')
+  })
 })
 
 const toggleEditBtn = document.querySelector('#toggle-edit')
+const saveEditBtn = document.querySelector('#save-edit')
+const cancelEditBtn = document.querySelector('#cancel-edit')
 const editableFields = Array.from(document.querySelectorAll('.input-field:not(.always-readonly), .mini-input:not(.always-readonly), .line-input:not(.always-readonly), .textarea-field:not(.always-readonly), .stat-input:not(.always-readonly), .substat-input:not(.always-readonly), .year-input:not(.always-readonly), .house-select:not(.always-readonly), .trait-input:not(.always-readonly), .grimoire-notes:not(.always-readonly), .sex-select:not(.always-readonly)'))
 let readonlyMode = true
 
@@ -505,9 +530,30 @@ const setReadonly = (readonly) => {
     }
     field.classList.toggle('readonly-field', readonly)
   })
-  toggleEditBtn.textContent = readonly ? 'Édition' : 'Verrouiller'
+  toggleEditBtn.hidden = !readonly
+  saveEditBtn.hidden = readonly
+  cancelEditBtn.hidden = readonly
 }
 
-toggleEditBtn.addEventListener('click', () => setReadonly(!readonlyMode))
+toggleEditBtn.addEventListener('click', () => setReadonly(false))
+
+saveEditBtn.addEventListener('click', () => {
+  StorageAdapter.save(collectState())
+  setReadonly(true)
+})
+
+cancelEditBtn.addEventListener('click', () => {
+  applyState(StorageAdapter.load() ?? defaultsState)
+  setReadonly(true)
+})
+
+// Snapshot of the template's built-in values, captured once, before any
+// saved state is applied. This is what "Annuler" falls back to when the
+// person cancels an edit session but has never saved anything yet.
+const defaultsState = collectState()
+
+// On boot: if a save exists, restore it over the defaults (this also fires
+// 'change' on <select> fields, e.g. re-syncing the house shield artwork).
+applyState(StorageAdapter.load())
 
 setReadonly(true)
