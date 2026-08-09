@@ -38,7 +38,15 @@ const espritSkillsLeft = ['Bluff', 'Farce', 'Tactique', 'Rumeur']
 const espritSkillsRight = ['Bagarre', 'Endurance', 'Perception', 'Précision']
 const coeurCorpsSkills = ['Décorum', 'Discrétion', 'Persuasion', 'Romance']
 
-const PIPS_PER_SKILL = 6
+const PIPS_PER_SKILL = 5
+
+// Course rank track: filled-pip-count -> malus/bonus, per "Nul(-2) / Moyen(0)
+// / Bon(2) / Excellent(4) / Génie(6)". At least 1 pip is always filled (0 is
+// not a valid state — you're never worse than "Nul"), so table[0] is unused
+// padding and the real range is index 1..5.
+const COURSE_MALUS_TABLE = [-2, -2, 0, 2, 4, 6]
+const COURSE_NEG_PIP_COUNT = 2 // the first N pips only ever reach a <= 0 malus
+const COURSE_MIN_FILLED = 1 // a course can never have zero pips filled
 
 /* ---------- helpers ---------- */
 
@@ -52,18 +60,23 @@ const slugify = (str) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
 
+const formatMalus = (value) => (value > 0 ? `+${value}` : `${value}`)
+
 /* ---------- small render helpers ---------- */
 
-const diamond = (fieldId) =>
-  `<button type="button" class="diamond" aria-label="rang" data-field="${fieldId}" data-field-type="toggle"></button>`
+const diamond = (fieldId, extraClass = '', on = false) =>
+  `<button type="button" class="diamond${extraClass ? ` ${extraClass}` : ''}${on ? ' on' : ''}" aria-label="rang" data-field="${fieldId}" data-field-type="toggle"></button>`
 
 const pipRow = (fieldBase, count = PIPS_PER_SKILL) =>
-  `<div class="pip-row">${Array.from({ length: count }, (_, i) => diamond(`${fieldBase}.pip.${i}`)).join('')}</div>`
+  `<div class="pip-row">${Array.from({ length: count }, (_, i) =>
+    diamond(`${fieldBase}.pip.${i}`, i < COURSE_NEG_PIP_COUNT ? 'diamond-neg' : '', i < COURSE_MIN_FILLED)
+  ).join('')}</div>`
 
 const skillRow = (name) => `
   <li class="skill-row">
     <span class="skill-name">${name}</span>
     ${pipRow(`skill.${slugify(name)}`)}
+    <span class="skill-malus">${formatMalus(COURSE_MALUS_TABLE[COURSE_MIN_FILLED])}</span>
   </li>
 `
 
@@ -449,14 +462,43 @@ document.querySelector('#app').innerHTML = `
 
 /* ---------- behaviour ---------- */
 
+// Recomputes and displays a course's malus/bonus from its filled pip count.
+const updateCourseMalus = (row) => {
+  const malusEl = row.querySelector('.skill-malus')
+  if (!malusEl) return
+  const filled = row.querySelectorAll('.pip-row .diamond.on').length
+  const value = COURSE_MALUS_TABLE[Math.min(Math.max(filled, COURSE_MIN_FILLED), COURSE_MALUS_TABLE.length - 1)]
+  malusEl.textContent = formatMalus(value)
+  malusEl.classList.toggle('positive', value > 0)
+}
+
+// Guards against a course ending up with 0 filled pips — including a saved
+// state from before this rule existed, which could still have 0 stored.
+// Re-run after any bulk state change (initial load, cancel) to self-heal.
+const enforceMinimumCoursePips = () => {
+  document.querySelectorAll('.pip-row').forEach((row) => {
+    const pips = row.querySelectorAll('.diamond')
+    const filledCount = row.querySelectorAll('.diamond.on').length
+    if (filledCount < COURSE_MIN_FILLED) {
+      for (let i = 0; i < COURSE_MIN_FILLED && i < pips.length; i += 1) {
+        pips[i].classList.add('on')
+      }
+    }
+  })
+}
+
 // clickable pips (skill ranks / spell mastery) toggle fill up to the clicked pip
 document.querySelectorAll('.pip-row').forEach((row) => {
   const pips = Array.from(row.querySelectorAll('.diamond'))
+  const skillRowEl = row.closest('.skill-row')
   pips.forEach((pip, index) => {
     pip.addEventListener('click', () => {
       if (readonlyMode) return
       const alreadyFull = pip.classList.contains('on') && (pips[index + 1] ? !pips[index + 1].classList.contains('on') : true)
-      pips.forEach((p, i) => p.classList.toggle('on', alreadyFull ? i < index : i <= index))
+      const targetCount = alreadyFull ? index : index + 1
+      const clampedCount = Math.max(targetCount, COURSE_MIN_FILLED)
+      pips.forEach((p, i) => p.classList.toggle('on', i < clampedCount))
+      if (skillRowEl) updateCourseMalus(skillRowEl)
     })
   })
 })
@@ -535,6 +577,10 @@ const setReadonly = (readonly) => {
   cancelEditBtn.hidden = readonly
 }
 
+const refreshAllCourseMalus = () => {
+  document.querySelectorAll('.skill-row').forEach(updateCourseMalus)
+}
+
 toggleEditBtn.addEventListener('click', () => setReadonly(false))
 
 saveEditBtn.addEventListener('click', () => {
@@ -544,6 +590,8 @@ saveEditBtn.addEventListener('click', () => {
 
 cancelEditBtn.addEventListener('click', () => {
   applyState(StorageAdapter.load() ?? defaultsState)
+  enforceMinimumCoursePips()
+  refreshAllCourseMalus()
   setReadonly(true)
 })
 
@@ -555,5 +603,7 @@ const defaultsState = collectState()
 // On boot: if a save exists, restore it over the defaults (this also fires
 // 'change' on <select> fields, e.g. re-syncing the house shield artwork).
 applyState(StorageAdapter.load())
+enforceMinimumCoursePips()
+refreshAllCourseMalus()
 
 setReadonly(true)

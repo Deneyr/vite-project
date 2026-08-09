@@ -742,6 +742,7 @@ button {
 
 .track-split .mini-input {
   -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 .track-split .mini-input:first-child {
@@ -945,6 +946,7 @@ input[type=number]:focus::-webkit-outer-spin-button {
 
 input[type=number] {
   -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 .textarea-field {
@@ -1002,7 +1004,7 @@ input[type=number] {
 
 .skill-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 10px;
 }
@@ -1040,6 +1042,31 @@ input[type=number] {
 .diamond.on {
   background: var(--accent);
   border-color: var(--accent);
+}
+
+/* First two pips of a course's rank track: filling them keeps the malus at
+   or below zero, so they get a muted grey fill instead of the accent color
+   even when "on", to read at a glance as "not yet positive". */
+.diamond-neg {
+  border-color: var(--ink-soft);
+}
+
+.diamond-neg.on {
+  background: var(--ink-soft);
+  border-color: var(--ink-soft);
+}
+
+.skill-malus {
+  min-width: 26px;
+  text-align: right;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.skill-malus.positive {
+  color: var(--accent);
 }
 
 .skill-note {
