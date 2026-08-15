@@ -13,6 +13,14 @@ const houseImages = {
   serdaigle: serdImg,
 }
 
+// What the Action de Maison +5 bonus applies to, per house.
+const houseActionDomains = {
+  griffondor: 'Héroïsme',
+  serdaigle: 'Connaissance',
+  poufsouffle: 'Amitié',
+  serpentard: 'Complot',
+}
+
 /* ---------- data ---------- */
 
 const mainCourses = [
@@ -130,6 +138,48 @@ const grimoireCard = (id, title, used = 0, total = 10) => `
         <input class="mini-input grimoire-ticket-input" type="number" value="${total}" min="0" data-field="grimoire.${id}.total" />
       </div>
       <span class="grimoire-footer-line"></span>
+    </div>
+  </article>
+`
+
+const HOUSE_PICK_OPTIONS = [
+  { key: 'neutre', label: 'N' },
+  { key: 'griffondor', label: 'G' }, // Gryffindor
+  { key: 'poufsouffle', label: 'H' }, // Hufflepuff
+  { key: 'serdaigle', label: 'R' }, // Ravenclaw
+  { key: 'serpentard', label: 'S' }, // Slytherin
+]
+
+// `id` is a stable key for persistence, same rationale as grimoireCard's id.
+// The "+2/+4" ticket is a fixed reminder, not per-friend data — no data-field.
+const friendCard = (id, title = 'Ami', defaultHouse = 'neutre') => `
+  <article class="grimoire-card friend-card">
+    <div class="grimoire-title">
+      <span class="grimoire-title-line"></span>
+      <input class="line-input grimoire-title-input" type="text" value="${title}" style="width: ${title.length + 6}ch" data-field="relation.${id}.title" />
+      <span class="grimoire-title-line"></span>
+    </div>
+    <textarea class="grimoire-notes" rows="4" data-field="relation.${id}.notes"></textarea>
+    <div class="friend-subtitle">
+      <span class="friend-subtitle-line"></span>
+      <span class="friend-subtitle-text">Description &amp; Traits</span>
+      <span class="friend-subtitle-line"></span>
+    </div>
+    <textarea class="grimoire-notes friend-notes-small" rows="3" data-field="relation.${id}.traits"></textarea>
+    <div class="friend-footer">
+      <div class="friend-footer-left">
+        <div class="grimoire-badge">${personIcon()}</div>
+        <div class="grimoire-ticket always-readonly" aria-hidden="true">+2/+4</div>
+      </div>
+      <div class="friend-houses">
+        ${HOUSE_PICK_OPTIONS.map(
+          (opt) => `
+        <label class="house-pick${opt.key === defaultHouse ? ' selected' : ''}">
+          <span class="diamond house-pip${opt.key === defaultHouse ? ' on' : ''}" data-field="relation.${id}.house.${opt.key}" data-field-type="toggle"></span>
+          <span class="house-pick-shape ${opt.key}">${opt.label}</span>
+        </label>`
+        ).join('')}
+      </div>
     </div>
   </article>
 `
@@ -260,6 +310,7 @@ document.querySelector('#app').innerHTML = `
           <div class="house-action">
             <span>Action de Maison</span>
             <div class="mini-input always-readonly action-value" aria-hidden="true">+5</div>
+            <span class="house-action-domain">Héroïsme</span>
           </div>
           <div class="points-eveil">
             <span class="points-title">Points d’éveil</span>
@@ -439,9 +490,10 @@ document.querySelector('#app').innerHTML = `
       </div>
     </section>
     <section class="tab-panel" data-tab="relations">
-      <div class="placeholder-panel">
-        <div class="placeholder-title">Relations</div>
-        <p>Contenu de l’onglet Relations à compléter ici pour les alliés, rivaux et contacts.</p>
+      <div class="grimoire-grid friend-grid">
+        ${friendCard('ami-1', 'Aria Valion', 'griffondor')}
+        ${friendCard('ami-2', 'Ami', 'poufsouffle')}
+        ${friendCard('ami-3', 'Ami', 'neutre')}
       </div>
     </section>
     <section class="tab-panel" data-tab="constellations">
@@ -511,13 +563,40 @@ document.querySelectorAll('.spell-row .diamond').forEach((pip) => {
   })
 })
 
-// origin: single-select among the three choices
+// origin: single-select among the three choices — clicking anywhere on the
+// row (label text included), not just the tiny diamond, selects it.
 const originPips = document.querySelectorAll('.origin-pip')
-originPips.forEach((pip) => {
-  pip.addEventListener('click', () => {
+document.querySelectorAll('.origin-choice').forEach((choice) => {
+  choice.addEventListener('click', (event) => {
     if (readonlyMode) return
+    event.preventDefault() // avoid any native label/checkbox side-effect
+    const pip = choice.querySelector('.origin-pip')
+    if (!pip) return
     originPips.forEach((p) => p.classList.remove('on'))
     pip.classList.add('on')
+  })
+})
+
+// relation cards: house affiliation is single-select, but scoped PER CARD
+// (each friend card has its own independent group of 5 house choices).
+const syncFriendHousePicks = (card) => {
+  card.querySelectorAll('.house-pick').forEach((wrapper) => {
+    const pip = wrapper.querySelector('.house-pip')
+    wrapper.classList.toggle('selected', Boolean(pip && pip.classList.contains('on')))
+  })
+}
+document.querySelectorAll('.friend-card').forEach((card) => {
+  const housePips = card.querySelectorAll('.house-pip')
+  card.querySelectorAll('.house-pick').forEach((choice) => {
+    choice.addEventListener('click', (event) => {
+      if (readonlyMode) return
+      event.preventDefault()
+      const pip = choice.querySelector('.house-pip')
+      if (!pip) return
+      housePips.forEach((p) => p.classList.remove('on'))
+      pip.classList.add('on')
+      syncFriendHousePicks(card)
+    })
   })
 })
 
@@ -530,6 +609,10 @@ if (houseSelect) {
     const shieldImg = houseBlock.querySelector('.shield-icon')
     if (shieldImg && houseImages[houseSelect.value]) {
       shieldImg.src = houseImages[houseSelect.value]
+    }
+    const domainEl = houseBlock.querySelector('.house-action-domain')
+    if (domainEl && houseActionDomains[houseSelect.value]) {
+      domainEl.textContent = houseActionDomains[houseSelect.value]
     }
   })
 }
@@ -581,6 +664,10 @@ const refreshAllCourseMalus = () => {
   document.querySelectorAll('.skill-row').forEach(updateCourseMalus)
 }
 
+const refreshAllFriendHousePicks = () => {
+  document.querySelectorAll('.friend-card').forEach(syncFriendHousePicks)
+}
+
 toggleEditBtn.addEventListener('click', () => setReadonly(false))
 
 saveEditBtn.addEventListener('click', () => {
@@ -592,6 +679,7 @@ cancelEditBtn.addEventListener('click', () => {
   applyState(StorageAdapter.load() ?? defaultsState)
   enforceMinimumCoursePips()
   refreshAllCourseMalus()
+  refreshAllFriendHousePicks()
   setReadonly(true)
 })
 
@@ -605,5 +693,6 @@ const defaultsState = collectState()
 applyState(StorageAdapter.load())
 enforceMinimumCoursePips()
 refreshAllCourseMalus()
+refreshAllFriendHousePicks()
 
 setReadonly(true)

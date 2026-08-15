@@ -150,6 +150,7 @@ button {
 .grimoire-title-input {
   flex: none;
   min-width: 0;
+  max-width: 78%;
   background: transparent;
   border: none;
   text-align: center;
@@ -264,6 +265,122 @@ button {
   .grimoire-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* ---------- Friend / relation cards (Relations tab) ---------- */
+/* Reuses .grimoire-card / .grimoire-title / .grimoire-notes / .grimoire-badge
+   / .grimoire-ticket wholesale — only the extra subtitle divider and the
+   house-affiliation footer are specific to this card type. */
+
+.friend-grid {
+  /* Wider minimum than .grimoire-grid's 300px: friend names need to fit a
+     full "Prénom Nom" in the title without the flanking lines squeezing it. */
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+}
+
+.friend-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 2px 0 14px;
+}
+
+.friend-subtitle-line {
+  flex: 1;
+  min-width: 8px;
+  height: 1px;
+  background: var(--line);
+}
+
+.friend-subtitle-text {
+  flex: none;
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.friend-notes-small {
+  flex: none;
+  min-height: 90px;
+  margin-bottom: 16px;
+}
+
+.friend-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.friend-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.friend-houses {
+  display: flex;
+  gap: 7px;
+}
+
+.house-pick {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.house-pick .diamond {
+  width: 9px;
+  height: 9px;
+}
+
+.house-pick-shape {
+  width: 28px;
+  height: 32px;
+  clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+  border: 2px solid var(--house-color, var(--line-strong));
+  background: var(--paper-strong);
+  display: grid;
+  place-items: center;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 0.64rem;
+  color: var(--house-color, var(--ink-soft));
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.house-pick-shape.neutre {
+  --house-color: var(--ink-soft);
+}
+
+.house-pick-shape.griffondor {
+  --house-color: #8c2318;
+}
+
+.house-pick-shape.poufsouffle {
+  --house-color: #ba8b17;
+}
+
+.house-pick-shape.serdaigle {
+  --house-color: #224f74;
+}
+
+.house-pick-shape.serpentard {
+  --house-color: #125234;
+}
+
+.house-pick.selected .house-pick-shape {
+  background: var(--house-color, var(--ink-soft));
+  color: var(--paper-strong);
+}
+
+.readonly-mode .house-pick {
+  cursor: not-allowed;
 }
 
 
@@ -413,7 +530,7 @@ button {
 
 .wand-block {
   flex: none;
-  width: 250px;
+  width: 200px;
 }
 
 .wand-header {
@@ -444,7 +561,7 @@ button {
 
 .wand-fields .field-row {
   grid-template-columns: 52px minmax(0, 1fr);
-  gap: 6px;
+  gap: 3px;
   margin-bottom: 8px;
 }
 
@@ -824,6 +941,17 @@ button {
   margin: 0 auto;
 }
 
+.house-action-domain {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 0.85rem;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--ink-soft);
+}
+
 .points-eveil {
   display: grid;
   gap: 12px;
@@ -1035,7 +1163,7 @@ input[type=number] {
   opacity: 0.7;
 }
 
-.readonly-mode .origin-pip {
+.readonly-mode .origin-choice {
   cursor: not-allowed;
 }
 
@@ -1558,6 +1686,10 @@ input[type=number] {
   }
 
   .top-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .friend-grid {
     grid-template-columns: 1fr;
   }
 
