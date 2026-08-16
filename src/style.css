@@ -150,7 +150,7 @@ button {
 .grimoire-title-input {
   flex: none;
   min-width: 0;
-  max-width: 78%;
+  max-width: 96%;
   background: transparent;
   border: none;
   text-align: center;
@@ -273,9 +273,29 @@ button {
    house-affiliation footer are specific to this card type. */
 
 .friend-grid {
-  /* Wider minimum than .grimoire-grid's 300px: friend names need to fit a
-     full "Prénom Nom" in the title without the flanking lines squeezing it. */
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  /* 1.5x the .grimoire-grid baseline (300px) — enough room for a full name
+     in the title without ballooning the card unreasonably. */
+  grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+}
+
+/* Scoped to .friend-card only, so the Bibliothèque grimoire titles are
+   untouched: the flanking lines are pinned to a small fixed width and the
+   name field flex-grows to claim the rest of the row — the card's own
+   width never changes, only how that fixed width is split. */
+.friend-card .grimoire-title {
+  gap: 6px;
+}
+
+.friend-card .grimoire-title-line {
+  flex: 0 0 14px;
+  min-width: 14px;
+}
+
+.friend-card .grimoire-title-input {
+  flex: 1 1 auto;
+  width: auto;
+  max-width: none;
+  min-width: 0;
 }
 
 .friend-subtitle {

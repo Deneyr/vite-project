@@ -21,6 +21,10 @@ const houseActionDomains = {
   serpentard: 'Complot',
 }
 
+// Single source of truth for the triangle's starting values, so the template
+// markup and the friend-card seeding logic can't drift apart.
+const DEFAULT_CORE_STATS = { esprit: 14, magie: 16, coeur: 12, corps: 13 }
+
 /* ---------- data ---------- */
 
 const mainCourses = [
@@ -156,7 +160,7 @@ const friendCard = (id, title = 'Ami', defaultHouse = 'neutre') => `
   <article class="grimoire-card friend-card">
     <div class="grimoire-title">
       <span class="grimoire-title-line"></span>
-      <input class="line-input grimoire-title-input" type="text" value="${title}" style="width: ${title.length + 6}ch" data-field="relation.${id}.title" />
+      <input class="line-input grimoire-title-input" type="text" value="${title}" data-field="relation.${id}.title" />
       <span class="grimoire-title-line"></span>
     </div>
     <textarea class="grimoire-notes" rows="4" data-field="relation.${id}.notes"></textarea>
@@ -358,14 +362,14 @@ document.querySelector('#app').innerHTML = `
               <div>
                 <div class="node-sub">mental</div>
                 <div class="node-label">Esprit</div>
-                <input class="stat-input" type="number" value="14" min="0" data-field="core.esprit" />
+                <input class="stat-input" type="number" value="${DEFAULT_CORE_STATS.esprit}" min="0" data-field="core.esprit" />
               </div>
             </div>
 
             <div class="node-circle node-magie">
               <div>
                 <div class="node-label">Magie</div>
-                <input class="stat-input" type="number" value="16" min="0" data-field="core.magie" />
+                <input class="stat-input" type="number" value="${DEFAULT_CORE_STATS.magie}" min="0" data-field="core.magie" />
               </div>
             </div>
 
@@ -373,7 +377,7 @@ document.querySelector('#app').innerHTML = `
               <div>
                 <div class="node-sub">social</div>
                 <div class="node-label">Cœur</div>
-                <input class="stat-input" type="number" value="12" min="0" data-field="core.coeur" />
+                <input class="stat-input" type="number" value="${DEFAULT_CORE_STATS.coeur}" min="0" data-field="core.coeur" />
               </div>
             </div>
 
@@ -381,7 +385,7 @@ document.querySelector('#app').innerHTML = `
               <div>
                 <div class="node-sub">physique</div>
                 <div class="node-label">Corps</div>
-                <input class="stat-input" type="number" value="13" min="0" data-field="core.corps" />
+                <input class="stat-input" type="number" value="${DEFAULT_CORE_STATS.corps}" min="0" data-field="core.corps" />
               </div>
             </div>
 
@@ -491,9 +495,7 @@ document.querySelector('#app').innerHTML = `
     </section>
     <section class="tab-panel" data-tab="relations">
       <div class="grimoire-grid friend-grid">
-        ${friendCard('ami-1', 'Aria Valion', 'griffondor')}
-        ${friendCard('ami-2', 'Ami', 'poufsouffle')}
-        ${friendCard('ami-3', 'Ami', 'neutre')}
+        ${Array.from({ length: DEFAULT_CORE_STATS.coeur }, (_, i) => friendCard(`ami-${i + 1}`, 'Ami', 'neutre')).join('')}
       </div>
     </section>
     <section class="tab-panel" data-tab="constellations">
@@ -579,26 +581,62 @@ document.querySelectorAll('.origin-choice').forEach((choice) => {
 
 // relation cards: house affiliation is single-select, but scoped PER CARD
 // (each friend card has its own independent group of 5 house choices).
+// Wrapped in a named function because the card count changes at runtime
+// (see renderFriendCards) — every rebuild needs to re-bind fresh elements.
 const syncFriendHousePicks = (card) => {
   card.querySelectorAll('.house-pick').forEach((wrapper) => {
     const pip = wrapper.querySelector('.house-pip')
     wrapper.classList.toggle('selected', Boolean(pip && pip.classList.contains('on')))
   })
 }
-document.querySelectorAll('.friend-card').forEach((card) => {
-  const housePips = card.querySelectorAll('.house-pip')
-  card.querySelectorAll('.house-pick').forEach((choice) => {
-    choice.addEventListener('click', (event) => {
-      if (readonlyMode) return
-      event.preventDefault()
-      const pip = choice.querySelector('.house-pip')
-      if (!pip) return
-      housePips.forEach((p) => p.classList.remove('on'))
-      pip.classList.add('on')
-      syncFriendHousePicks(card)
+const bindFriendCardInteractivity = () => {
+  document.querySelectorAll('.friend-card').forEach((card) => {
+    const housePips = card.querySelectorAll('.house-pip')
+    card.querySelectorAll('.house-pick').forEach((choice) => {
+      choice.addEventListener('click', (event) => {
+        if (readonlyMode) return
+        event.preventDefault()
+        const pip = choice.querySelector('.house-pip')
+        if (!pip) return
+        housePips.forEach((p) => p.classList.remove('on'))
+        pip.classList.add('on')
+        syncFriendHousePicks(card)
+      })
     })
   })
-})
+}
+
+// Renders exactly `count` friend cards (ami-1 .. ami-count) into the
+// Relations grid. Cards beyond the new count are removed from view but NOT
+// deleted from storage (StorageAdapter.save merges rather than replaces —
+// see persistence.js), so raising Cœur again later brings their old
+// content back. Called only at boot / Sauvegarder / Annuler, never live
+// while typing, so the list doesn't jump around mid-edit.
+const renderFriendCards = (count) => {
+  const grid = document.querySelector('.friend-grid')
+  if (!grid) return
+
+  // Whatever is currently on screen for these cards — including edits made
+  // this session that haven't been saved yet — must survive the rebuild.
+  const inProgress = collectState(grid)
+
+  const safeCount = Number.isFinite(count) ? Math.max(count, 0) : 0
+  grid.innerHTML = Array.from({ length: safeCount }, (_, i) => friendCard(`ami-${i + 1}`, 'Ami', 'neutre')).join('')
+
+  bindFriendCardInteractivity()
+  // Scoped to `grid` only — an unscoped applyState() here would also touch
+  // matching data-fields elsewhere in the document (core.coeur itself lives
+  // outside the grid!) and could clobber an in-progress, not-yet-saved edit.
+  applyState(StorageAdapter.load(), grid) // last saved content, for ids that pre-date this rebuild
+  applyState(inProgress, grid) // this session's unsaved edits take priority over the saved copy
+  refreshAllFriendHousePicks()
+}
+
+const getCoeurCardCount = () => {
+  const el = document.querySelector('[data-field="core.coeur"]')
+  const value = el ? parseInt(el.value, 10) : DEFAULT_CORE_STATS.coeur
+  return Number.isFinite(value) ? Math.max(value, 0) : 0
+}
 
 const houseBlock = document.querySelector('.house-block')
 const houseSelect = document.querySelector('.house-select')
@@ -640,13 +678,17 @@ document.querySelectorAll('.tracker-icons .icon-toggle').forEach((btn) => {
 const toggleEditBtn = document.querySelector('#toggle-edit')
 const saveEditBtn = document.querySelector('#save-edit')
 const cancelEditBtn = document.querySelector('#cancel-edit')
-const editableFields = Array.from(document.querySelectorAll('.input-field:not(.always-readonly), .mini-input:not(.always-readonly), .line-input:not(.always-readonly), .textarea-field:not(.always-readonly), .stat-input:not(.always-readonly), .substat-input:not(.always-readonly), .year-input:not(.always-readonly), .house-select:not(.always-readonly), .trait-input:not(.always-readonly), .grimoire-notes:not(.always-readonly), .sex-select:not(.always-readonly)'))
+const EDITABLE_SELECTOR =
+  '.input-field:not(.always-readonly), .mini-input:not(.always-readonly), .line-input:not(.always-readonly), .textarea-field:not(.always-readonly), .stat-input:not(.always-readonly), .substat-input:not(.always-readonly), .year-input:not(.always-readonly), .house-select:not(.always-readonly), .trait-input:not(.always-readonly), .grimoire-notes:not(.always-readonly), .sex-select:not(.always-readonly)'
 let readonlyMode = true
 
 const setReadonly = (readonly) => {
   readonlyMode = readonly
   document.body.classList.toggle('readonly-mode', readonly)
-  editableFields.forEach((field) => {
+  // Queried fresh every call (rather than cached once) because
+  // renderFriendCards() can create new fields at runtime — a stale cached
+  // list would leave those unlocked/locked incorrectly.
+  document.querySelectorAll(EDITABLE_SELECTOR).forEach((field) => {
     if ('readOnly' in field) {
       field.readOnly = readonly
     }
@@ -671,6 +713,9 @@ const refreshAllFriendHousePicks = () => {
 toggleEditBtn.addEventListener('click', () => setReadonly(false))
 
 saveEditBtn.addEventListener('click', () => {
+  // Resize the friend-card list to match Cœur *before* collecting/saving,
+  // so the save reflects the count the person is committing to.
+  renderFriendCards(getCoeurCardCount())
   StorageAdapter.save(collectState())
   setReadonly(true)
 })
@@ -679,7 +724,9 @@ cancelEditBtn.addEventListener('click', () => {
   applyState(StorageAdapter.load() ?? defaultsState)
   enforceMinimumCoursePips()
   refreshAllCourseMalus()
-  refreshAllFriendHousePicks()
+  // Cœur may have just been reverted above — resize the friend-card list
+  // to match whatever it reverted back to.
+  renderFriendCards(getCoeurCardCount())
   setReadonly(true)
 })
 
@@ -693,6 +740,8 @@ const defaultsState = collectState()
 applyState(StorageAdapter.load())
 enforceMinimumCoursePips()
 refreshAllCourseMalus()
-refreshAllFriendHousePicks()
+// Cœur may have just been restored to a saved value above — make sure the
+// friend-card count (and any of their own previously-saved content) matches.
+renderFriendCards(getCoeurCardCount())
 
 setReadonly(true)

@@ -59,9 +59,16 @@ export function applyState(state, root = document) {
 
 /** localStorage-backed storage. Swap this object out to change where saves live. */
 export const StorageAdapter = {
-  save(state) {
+  // Merges into whatever is already stored rather than replacing it wholesale.
+  // This matters for fields that can be temporarily absent from the DOM (e.g.
+  // a friend card hidden because Cœur went down) — their last known value
+  // stays in storage instead of being wiped just because collectState()
+  // didn't see them this time. Pass { replace: true } to opt out and force
+  // a full overwrite instead.
+  save(state, { replace = false } = {}) {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+      const next = replace ? state : { ...(this.load() || {}), ...state }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
       return true
     } catch (err) {
       console.error('Sauvegarde impossible :', err)
