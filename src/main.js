@@ -155,8 +155,15 @@ const HOUSE_PICK_OPTIONS = [
 ]
 
 // `id` is a stable key for persistence, same rationale as grimoireCard's id.
-// The "+2/+4" ticket is a fixed reminder, not per-friend data — no data-field.
-const friendCard = (id, title = 'Ami', defaultHouse = 'neutre') => `
+// The ticket ("+2/+4", "+5/+10"...) is a fixed reminder, not per-friend data
+// — no data-field for it. `options` covers the "Ami Fantastique" variant
+// (Arcanes tab): a different ticket value, an explanatory caption next to
+// it, and no house-affiliation picker (a magical creature has no house).
+const friendCard = (
+  id,
+  title = 'Ami',
+  { defaultHouse = 'neutre', ticketText = '+2/+4', ticketCaption = '', showHousePicker = true } = {}
+) => `
   <article class="grimoire-card friend-card">
     <div class="grimoire-title">
       <span class="grimoire-title-line"></span>
@@ -173,9 +180,12 @@ const friendCard = (id, title = 'Ami', defaultHouse = 'neutre') => `
     <div class="friend-footer">
       <div class="friend-footer-left">
         <div class="grimoire-badge">${personIcon()}</div>
-        <div class="grimoire-ticket always-readonly" aria-hidden="true">+2/+4</div>
+        <div class="grimoire-ticket always-readonly" aria-hidden="true">${ticketText}</div>
+        ${ticketCaption ? `<span class="friend-ticket-caption">${ticketCaption}</span>` : ''}
       </div>
-      <div class="friend-houses">
+      ${
+        showHousePicker
+          ? `<div class="friend-houses">
         ${HOUSE_PICK_OPTIONS.map(
           (opt) => `
         <label class="house-pick${opt.key === defaultHouse ? ' selected' : ''}">
@@ -183,7 +193,51 @@ const friendCard = (id, title = 'Ami', defaultHouse = 'neutre') => `
           <span class="house-pick-shape ${opt.key}">${opt.label}</span>
         </label>`
         ).join('')}
-      </div>
+      </div>`
+          : ''
+      }
+    </div>
+  </article>
+`
+
+const starIcon = () => `
+  <svg viewBox="0 0 24 24"><path d="M12 2v20M2 12h20M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4" stroke-linecap="round"/></svg>
+`
+
+// Zigzag progress track, normalized to a 0-100 box (see the core-triangle for
+// the same SVG-lines-plus-absolutely-positioned-nodes pattern).
+const CONSTELLATION_NODES = [
+  { left: 8, top: 22 },
+  { left: 29, top: 74 },
+  { left: 50, top: 22 },
+  { left: 71, top: 74 },
+  { left: 92, top: 22 },
+]
+
+// `id` is a stable key for persistence, same rationale as the other cards.
+const constellationCard = (id, title = 'Constellation') => `
+  <article class="grimoire-card constellation-card">
+    <div class="grimoire-title">
+      <span class="grimoire-title-line"></span>
+      <input class="line-input grimoire-title-input" type="text" value="${title}" style="width: ${title.length + 2}ch" data-field="arcane.${id}.title" />
+      <span class="grimoire-title-line"></span>
+    </div>
+    <div class="constellation-track-wrap">
+      <svg class="constellation-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <polyline class="constellation-edge" points="${CONSTELLATION_NODES.map((p) => `${p.left},${p.top}`).join(' ')}" />
+      </svg>
+      ${CONSTELLATION_NODES.map(
+        (p, i) =>
+          `<button type="button" class="diamond constellation-node" style="left:${p.left}%;top:${p.top}%" aria-label="étape ${i + 1}" data-field="arcane.${id}.pip.${i}" data-field-type="toggle"></button>`
+      ).join('')}
+      <span class="constellation-label">Progression</span>
+    </div>
+    <div class="constellation-benefits">
+      <span class="constellation-benefits-label">Bénéfices :</span>
+      <textarea class="grimoire-notes constellation-benefits-notes" rows="5" data-field="arcane.${id}.benefices"></textarea>
+    </div>
+    <div class="friend-footer">
+      <div class="grimoire-badge">${starIcon()}</div>
     </div>
   </article>
 `
@@ -207,7 +261,7 @@ document.querySelector('#app').innerHTML = `
     <button type="button" class="tab-button active" data-tab="overview">Fiche</button>
     <button type="button" class="tab-button" data-tab="bibliotheque">Bibliothèque</button>
     <button type="button" class="tab-button" data-tab="relations">Relations</button>
-    <button type="button" class="tab-button" data-tab="constellations">Constellations</button>
+    <button type="button" class="tab-button" data-tab="arcanes">Arcanes</button>
     <button type="button" class="tab-button" data-tab="familiers">Familiers</button>
   </div>
 
@@ -495,13 +549,18 @@ document.querySelector('#app').innerHTML = `
     </section>
     <section class="tab-panel" data-tab="relations">
       <div class="grimoire-grid friend-grid">
-        ${Array.from({ length: DEFAULT_CORE_STATS.coeur }, (_, i) => friendCard(`ami-${i + 1}`, 'Ami', 'neutre')).join('')}
+        ${Array.from({ length: DEFAULT_CORE_STATS.coeur }, (_, i) => friendCard(`ami-${i + 1}`, 'Ami', { defaultHouse: 'neutre' })).join('')}
       </div>
     </section>
-    <section class="tab-panel" data-tab="constellations">
-      <div class="placeholder-panel">
-        <div class="placeholder-title">Constellations</div>
-        <p>Contenu de l’onglet Constellations à compléter ici pour les cartes célestes et signes.</p>
+    <section class="tab-panel" data-tab="arcanes">
+      <div class="grimoire-grid arcanes-grid">
+        ${friendCard('arcane-ami', 'Ami')}
+        ${constellationCard('constellation-1', 'Constellation')}
+        ${friendCard('arcane-ami-fantastique', 'Ami Fantastique', {
+          ticketText: '+5/+10',
+          ticketCaption: 'pour une action liée à ses pouvoirs',
+          showHousePicker: false,
+        })}
       </div>
     </section>
     <section class="tab-panel" data-tab="familiers">
@@ -541,20 +600,39 @@ const enforceMinimumCoursePips = () => {
   })
 }
 
-// clickable pips (skill ranks / spell mastery) toggle fill up to the clicked pip
-document.querySelectorAll('.pip-row').forEach((row) => {
+// Shared "cascade" behaviour for a row of ordered diamonds: clicking one
+// fills every pip up to and including it; clicking the current highest one
+// again empties back down to `minFilled`. Used by course rank tracks and by
+// the constellation progress track — same interaction, different minimums.
+const bindCascadeToggleGroup = (row, { minFilled = 0, onChange } = {}) => {
   const pips = Array.from(row.querySelectorAll('.diamond'))
-  const skillRowEl = row.closest('.skill-row')
   pips.forEach((pip, index) => {
     pip.addEventListener('click', () => {
       if (readonlyMode) return
       const alreadyFull = pip.classList.contains('on') && (pips[index + 1] ? !pips[index + 1].classList.contains('on') : true)
       const targetCount = alreadyFull ? index : index + 1
-      const clampedCount = Math.max(targetCount, COURSE_MIN_FILLED)
+      const clampedCount = Math.max(targetCount, minFilled)
       pips.forEach((p, i) => p.classList.toggle('on', i < clampedCount))
-      if (skillRowEl) updateCourseMalus(skillRowEl)
+      if (onChange) onChange()
     })
   })
+}
+
+// clickable pips (skill ranks) toggle fill up to the clicked pip
+document.querySelectorAll('.pip-row').forEach((row) => {
+  const skillRowEl = row.closest('.skill-row')
+  bindCascadeToggleGroup(row, {
+    minFilled: COURSE_MIN_FILLED,
+    onChange: () => {
+      if (skillRowEl) updateCourseMalus(skillRowEl)
+    },
+  })
+})
+
+// constellation progress track: same cascade interaction, no minimum (an
+// untouched constellation legitimately starts fully unfilled).
+document.querySelectorAll('.constellation-track-wrap').forEach((wrap) => {
+  bindCascadeToggleGroup(wrap, { minFilled: 0 })
 })
 
 // single mastery pip per spell just toggles on/off
@@ -621,7 +699,7 @@ const renderFriendCards = (count) => {
   const inProgress = collectState(grid)
 
   const safeCount = Number.isFinite(count) ? Math.max(count, 0) : 0
-  grid.innerHTML = Array.from({ length: safeCount }, (_, i) => friendCard(`ami-${i + 1}`, 'Ami', 'neutre')).join('')
+  grid.innerHTML = Array.from({ length: safeCount }, (_, i) => friendCard(`ami-${i + 1}`, 'Ami', { defaultHouse: 'neutre' })).join('')
 
   bindFriendCardInteractivity()
   // Scoped to `grid` only — an unscoped applyState() here would also touch
