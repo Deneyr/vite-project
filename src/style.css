@@ -123,7 +123,11 @@ button {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  min-height: 360px;
+  /* Shared by every card type (grimoire/friend/constellation) so they all
+     end up the same height — the constellation card's fixed content (track
+     + benefits + 7 steps + footer) is the tallest, so this is sized for it;
+     the other cards just get a taller flex-growing notes area to match. */
+  min-height: 600px;
   border: 2px solid var(--line-strong);
   border-radius: var(--radius-sm);
   background: var(--paper);
@@ -134,23 +138,27 @@ button {
 .grimoire-title {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 6px;
   flex: none;
   margin-bottom: 18px;
 }
 
 .grimoire-title-line {
-  flex: 1;
-  min-width: 10px;
+  /* Fixed, small, identical on every card — the name field claims
+     whatever's left of the row, so its size only ever depends on the
+     card's own width, never on the title text or the card type. */
+  flex: 0 0 14px;
+  min-width: 14px;
   height: 2px;
   background: var(--ink-soft);
   opacity: 0.55;
 }
 
 .grimoire-title-input {
-  flex: none;
+  flex: 1 1 auto;
+  width: auto;
   min-width: 0;
-  max-width: 96%;
+  max-width: none;
   background: transparent;
   border: none;
   text-align: center;
@@ -282,21 +290,9 @@ button {
    untouched: the flanking lines are pinned to a small fixed width and the
    name field flex-grows to claim the rest of the row — the card's own
    width never changes, only how that fixed width is split. */
-.friend-card .grimoire-title {
-  gap: 6px;
-}
-
-.friend-card .grimoire-title-line {
-  flex: 0 0 14px;
-  min-width: 14px;
-}
-
-.friend-card .grimoire-title-input {
-  flex: 1 1 auto;
-  width: auto;
-  max-width: none;
-  min-width: 0;
-}
+/* Title sizing (flanking lines + name field) now lives entirely in the base
+   .grimoire-title* rules above, shared by every card type — no per-card-type
+   override needed here any more. */
 
 .friend-subtitle {
   display: flex;
@@ -420,9 +416,9 @@ button {
 
 .constellation-track-wrap {
   position: relative;
-  width: 100%;
+  width: 78%;
+  margin: 6px auto 20px;
   aspect-ratio: 100 / 46;
-  margin: 6px 0 20px;
 }
 
 .constellation-lines {
@@ -463,29 +459,71 @@ button {
   white-space: nowrap;
 }
 
-.constellation-benefits {
-  position: relative;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.constellation-benefits-label {
+.diamond.constellation-node {
   position: absolute;
-  top: 6px;
-  left: 4px;
-  font-family: var(--serif);
-  font-style: italic;
-  font-size: 0.95rem;
-  color: var(--ink);
-  pointer-events: none;
+  width: 16px;
+  height: 16px;
+  transform: translate(-50%, -50%) rotate(45deg);
   z-index: 1;
 }
 
-.constellation-benefits-notes {
-  flex: 1;
-  padding-left: 92px;
+.constellation-label {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--paper);
+  padding: 0 8px;
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.constellation-benefit-row {
+  flex: none;
   margin-bottom: 16px;
+}
+
+.constellation-steps {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+.constellation-steps-label {
+  margin-bottom: 8px;
+}
+
+.constellation-steps-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 9px;
+}
+
+.constellation-step-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.constellation-step-index {
+  flex: none;
+  width: 14px;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+.constellation-step-row .line-input {
+  flex: 1;
 }
 
 @media (max-width: 640px) {

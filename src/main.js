@@ -130,7 +130,7 @@ const grimoireCard = (id, title, used = 0, total = 10) => `
   <article class="grimoire-card">
     <div class="grimoire-title">
       <span class="grimoire-title-line"></span>
-      <input class="line-input grimoire-title-input" type="text" value="${title}" style="width: ${title.length + 2}ch" data-field="grimoire.${id}.title" />
+      <input class="line-input grimoire-title-input" type="text" value="${title}" data-field="grimoire.${id}.title" />
       <span class="grimoire-title-line"></span>
     </div>
     <textarea class="grimoire-notes" rows="6" placeholder="" data-field="grimoire.${id}.notes"></textarea>
@@ -205,13 +205,15 @@ const starIcon = () => `
 `
 
 // Zigzag progress track, normalized to a 0-100 box (see the core-triangle for
-// the same SVG-lines-plus-absolutely-positioned-nodes pattern).
+// the same SVG-lines-plus-absolutely-positioned-nodes pattern). 7 stages.
 const CONSTELLATION_NODES = [
-  { left: 8, top: 22 },
-  { left: 29, top: 74 },
-  { left: 50, top: 22 },
-  { left: 71, top: 74 },
-  { left: 92, top: 22 },
+  { left: 6, top: 22 },
+  { left: 21, top: 74 },
+  { left: 35, top: 22 },
+  { left: 50, top: 74 },
+  { left: 65, top: 22 },
+  { left: 79, top: 74 },
+  { left: 94, top: 22 },
 ]
 
 // `id` is a stable key for persistence, same rationale as the other cards.
@@ -219,7 +221,7 @@ const constellationCard = (id, title = 'Constellation') => `
   <article class="grimoire-card constellation-card">
     <div class="grimoire-title">
       <span class="grimoire-title-line"></span>
-      <input class="line-input grimoire-title-input" type="text" value="${title}" style="width: ${title.length + 2}ch" data-field="arcane.${id}.title" />
+      <input class="line-input grimoire-title-input" type="text" value="${title}" data-field="arcane.${id}.title" />
       <span class="grimoire-title-line"></span>
     </div>
     <div class="constellation-track-wrap">
@@ -232,9 +234,21 @@ const constellationCard = (id, title = 'Constellation') => `
       ).join('')}
       <span class="constellation-label">Progression</span>
     </div>
-    <div class="constellation-benefits">
-      <span class="constellation-benefits-label">Bénéfices :</span>
-      <textarea class="grimoire-notes constellation-benefits-notes" rows="5" data-field="arcane.${id}.benefices"></textarea>
+    <div class="field-row constellation-benefit-row">
+      <span>Bénéfices</span>
+      <input class="line-input" type="text" data-field="arcane.${id}.benefices" />
+    </div>
+    <div class="constellation-steps">
+      <span class="block-label constellation-steps-label">Étapes</span>
+      <ol class="constellation-steps-list">
+        ${CONSTELLATION_NODES.map(
+          (_, i) => `
+        <li class="constellation-step-row">
+          <span class="constellation-step-index">${i + 1}</span>
+          <input class="line-input" type="text" data-field="arcane.${id}.step.${i}" />
+        </li>`
+        ).join('')}
+      </ol>
     </div>
     <div class="friend-footer">
       <div class="grimoire-badge">${starIcon()}</div>
