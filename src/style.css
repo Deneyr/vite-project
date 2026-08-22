@@ -123,16 +123,22 @@ button {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  /* Shared by every card type (grimoire/friend/constellation) so they all
-     end up the same height — the constellation card's fixed content (track
-     + benefits + 7 steps + footer) is the tallest, so this is sized for it;
-     the other cards just get a taller flex-growing notes area to match. */
-  min-height: 600px;
+  min-height: 360px;
   border: 2px solid var(--line-strong);
   border-radius: var(--radius-sm);
   background: var(--paper);
   padding: 22px 20px 18px;
   box-shadow: var(--shadow-soft);
+}
+
+/* Friend / constellation cards (Relations + Arcanes) need more room than a
+   plain Bibliothèque note card — the constellation's track + benefits + 7
+   steps + footer is the tallest content, so this is sized for it. Scoped
+   here rather than raising the shared min-height above, which would have
+   made every Bibliothèque card needlessly tall too. */
+.friend-card,
+.constellation-card {
+  min-height: 600px;
 }
 
 .grimoire-title {
@@ -267,6 +273,58 @@ button {
   align-self: flex-end;
   margin-bottom: 10px;
   border-bottom: 1px solid var(--line);
+}
+
+/* ---------- Add / remove grimoire cards (Bibliothèque tab) ---------- */
+
+.card-delete-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line-strong);
+  background: var(--paper-strong);
+  color: var(--ink-soft);
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 3;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.card-delete-btn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--paper-strong);
+}
+
+/* Only meaningful in edit mode, same as the pips/toggles elsewhere. */
+.readonly-mode .card-delete-btn {
+  display: none;
+}
+
+.add-card-btn {
+  margin-top: 20px;
+  padding: 10px 22px;
+  border-radius: 999px;
+  border: 1.5px dashed var(--line-strong);
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: var(--serif);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.add-card-btn:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 @media (max-width: 640px) {
@@ -416,8 +474,8 @@ button {
 
 .constellation-track-wrap {
   position: relative;
-  width: 78%;
-  margin: 6px auto 20px;
+  width: 88%;
+  margin: 6px auto 30px;
   aspect-ratio: 100 / 46;
 }
 
@@ -437,30 +495,6 @@ button {
 
 .diamond.constellation-node {
   position: absolute;
-  width: 20px;
-  height: 20px;
-  transform: translate(-50%, -50%) rotate(45deg);
-  z-index: 1;
-}
-
-.constellation-label {
-  position: absolute;
-  top: 48%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: var(--paper);
-  padding: 0 8px;
-  font-family: var(--display);
-  font-style: italic;
-  font-size: 0.68rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-soft);
-  white-space: nowrap;
-}
-
-.diamond.constellation-node {
-  position: absolute;
   width: 16px;
   height: 16px;
   transform: translate(-50%, -50%) rotate(45deg);
@@ -472,15 +506,21 @@ button {
   top: 48%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: var(--paper);
-  padding: 0 8px;
+  padding: 0 4px;
+  background: none;
   font-family: var(--display);
   font-style: italic;
+  font-weight: 600;
   font-size: 0.68rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ink-soft);
   white-space: nowrap;
+  z-index: 2;
+  /* Soft halo hugging the letters themselves (not a rectangular box) so the
+     text stays readable over the crossing lines without visibly covering
+     any part of the diagram beyond the glyphs. */
+  text-shadow: 0 0 3px var(--paper), 0 0 3px var(--paper), 0 0 3px var(--paper);
 }
 
 .constellation-benefit-row {

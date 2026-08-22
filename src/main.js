@@ -25,6 +25,17 @@ const houseActionDomains = {
 // markup and the friend-card seeding logic can't drift apart.
 const DEFAULT_CORE_STATS = { esprit: 14, magie: 16, coeur: 12, corps: 13 }
 
+// Starting set of grimoire cards, and the shape their default content takes.
+// This is the single source of truth for both the initial render and the
+// "no save yet" fallback used by Annuler.
+const DEFAULT_GRIMOIRES = [
+  { id: 'bibliotheque', title: 'Bibliothèque', used: 3, total: 10 },
+  { id: 'grimoire-des-sortileges', title: 'Grimoire des Sortilèges', used: 5, total: 12 },
+  { id: 'carnet-de-recherche', title: 'Carnet de Recherche', used: 1, total: 6 },
+  { id: 'almanach-celeste', title: 'Almanach Céleste', used: 0, total: 8 },
+]
+const DEFAULT_GRIMOIRE_IDS = DEFAULT_GRIMOIRES.map((g) => g.id)
+
 /* ---------- data ---------- */
 
 const mainCourses = [
@@ -126,8 +137,9 @@ const wandIcon = () => `
 
 // `id` is a stable key for persistence — independent from the title text,
 // so renaming a grimoire later won't orphan its saved notes/counters.
-const grimoireCard = (id, title, used = 0, total = 10) => `
-  <article class="grimoire-card">
+const grimoireCard = (id, title = '', used = 0, total = 10) => `
+  <article class="grimoire-card" data-card-id="${id}">
+    <button type="button" class="card-delete-btn" aria-label="Supprimer ce grimoire" data-remove-grimoire="${id}">×</button>
     <div class="grimoire-title">
       <span class="grimoire-title-line"></span>
       <input class="line-input grimoire-title-input" type="text" value="${title}" data-field="grimoire.${id}.title" />
@@ -554,12 +566,11 @@ document.querySelector('#app').innerHTML = `
       </section>
     </section>
     <section class="tab-panel" data-tab="bibliotheque">
-      <div class="grimoire-grid">
-        ${grimoireCard('bibliotheque', 'Bibliothèque', 3, 10)}
-        ${grimoireCard('grimoire-des-sortileges', 'Grimoire des Sortilèges', 5, 12)}
-        ${grimoireCard('carnet-de-recherche', 'Carnet de Recherche', 1, 6)}
-        ${grimoireCard('almanach-celeste', 'Almanach Céleste', 0, 8)}
+      <input type="hidden" data-field="meta.grimoire-ids" value='${JSON.stringify(DEFAULT_GRIMOIRE_IDS)}' />
+      <div class="grimoire-grid bibliotheque-grid">
+        ${DEFAULT_GRIMOIRES.map((g) => grimoireCard(g.id, g.title, g.used, g.total)).join('')}
       </div>
+      <button type="button" id="add-grimoire" class="add-card-btn" hidden>+ Ajouter un grimoire</button>
     </section>
     <section class="tab-panel" data-tab="relations">
       <div class="grimoire-grid friend-grid">
@@ -570,7 +581,17 @@ document.querySelector('#app').innerHTML = `
       <div class="grimoire-grid arcanes-grid">
         ${friendCard('arcane-ami', 'Ami')}
         ${constellationCard('constellation-1', 'Constellation')}
-        ${friendCard('arcane-ami-fantastique', 'Ami Fantastique', {
+        ${friendCard('arcane-ami-fantastique-1', 'Ami Fantastique', {
+          ticketText: '+5/+10',
+          ticketCaption: 'pour une action liée à ses pouvoirs',
+          showHousePicker: false,
+        })}
+        ${friendCard('arcane-ami-fantastique-2', 'Ami Fantastique', {
+          ticketText: '+5/+10',
+          ticketCaption: 'pour une action liée à ses pouvoirs',
+          showHousePicker: false,
+        })}
+        ${friendCard('arcane-ami-fantastique-3', 'Ami Fantastique', {
           ticketText: '+5/+10',
           ticketCaption: 'pour une action liée à ses pouvoirs',
           showHousePicker: false,
@@ -730,6 +751,66 @@ const getCoeurCardCount = () => {
   return Number.isFinite(value) ? Math.max(value, 0) : 0
 }
 
+// Grimoire cards (Bibliothèque tab) are add/remove by hand rather than
+// driven by a stat, so — unlike friend cards — we track an explicit ORDERED
+// LIST of ids, not just a count. That list lives in a hidden [data-field]
+// input, so it rides along in collectState()/applyState() like any other
+// field, with no special-casing needed in persistence.js.
+const getGrimoireIds = () => {
+  const field = document.querySelector('[data-field="meta.grimoire-ids"]')
+  if (!field) return DEFAULT_GRIMOIRE_IDS
+  try {
+    const parsed = JSON.parse(field.value)
+    return Array.isArray(parsed) ? parsed : DEFAULT_GRIMOIRE_IDS
+  } catch {
+    return DEFAULT_GRIMOIRE_IDS
+  }
+}
+
+// Renders exactly the given list of grimoire cards into the Bibliothèque
+// grid, and keeps the hidden id-list field in sync so the next save
+// persists the current composition. Same non-destructive rebuild pattern
+// as renderFriendCards: in-progress edits survive, removed cards' saved
+// data is left alone in storage (merge-based save, see persistence.js) —
+// there's just no path back to a deleted card here since new ids are
+// unique per click, unlike Cœur simply raising the count again.
+const renderGrimoireCards = (ids) => {
+  const grid = document.querySelector('.bibliotheque-grid')
+  const idsField = document.querySelector('[data-field="meta.grimoire-ids"]')
+  if (!grid) return
+
+  const inProgress = collectState(grid)
+
+  grid.innerHTML = ids.map((id) => grimoireCard(id)).join('')
+
+  applyState(StorageAdapter.load(), grid)
+  applyState(inProgress, grid)
+
+  if (idsField) idsField.value = JSON.stringify(ids)
+}
+
+const addGrimoireBtn = document.querySelector('#add-grimoire')
+if (addGrimoireBtn) {
+  addGrimoireBtn.addEventListener('click', () => {
+    if (readonlyMode) return
+    const ids = getGrimoireIds()
+    renderGrimoireCards([...ids, `grimoire-custom-${Date.now()}`])
+  })
+}
+
+// One delegated listener on the grid handles every delete button, including
+// ones on cards created after this line runs — no per-card rebinding needed.
+const bibliothequeGrid = document.querySelector('.bibliotheque-grid')
+if (bibliothequeGrid) {
+  bibliothequeGrid.addEventListener('click', (event) => {
+    if (readonlyMode) return
+    const btn = event.target.closest('.card-delete-btn')
+    if (!btn) return
+    const idToRemove = btn.dataset.removeGrimoire
+    renderGrimoireCards(getGrimoireIds().filter((id) => id !== idToRemove))
+  })
+}
+
 const houseBlock = document.querySelector('.house-block')
 const houseSelect = document.querySelector('.house-select')
 if (houseSelect) {
@@ -792,6 +873,7 @@ const setReadonly = (readonly) => {
   toggleEditBtn.hidden = !readonly
   saveEditBtn.hidden = readonly
   cancelEditBtn.hidden = readonly
+  if (addGrimoireBtn) addGrimoireBtn.hidden = readonly
 }
 
 const refreshAllCourseMalus = () => {
@@ -819,6 +901,9 @@ cancelEditBtn.addEventListener('click', () => {
   // Cœur may have just been reverted above — resize the friend-card list
   // to match whatever it reverted back to.
   renderFriendCards(getCoeurCardCount())
+  // Any grimoire cards added/removed this session, unsaved, are undone —
+  // rebuild to whatever list was last saved (or the 4 defaults).
+  renderGrimoireCards(getGrimoireIds())
   setReadonly(true)
 })
 
@@ -835,5 +920,8 @@ refreshAllCourseMalus()
 // Cœur may have just been restored to a saved value above — make sure the
 // friend-card count (and any of their own previously-saved content) matches.
 renderFriendCards(getCoeurCardCount())
+// Same idea for the grimoire list: rebuild to whatever composition (if any)
+// was saved, restoring each card's own content in the process.
+renderGrimoireCards(getGrimoireIds())
 
 setReadonly(true)
